@@ -1,0 +1,131 @@
+@import "../../colors";
+
+.ek-header-notifications {
+
+    &__drop {
+        margin-top: 10px;
+
+        ek-drop-target {
+            position: relative;
+        }
+
+        &__button {
+            color: @white;
+            &__icon {
+                svg {
+                    path {
+                        fill: @white;
+                    }
+                }
+            }
+
+        }
+
+        &__counter {
+            width: 30px;
+            position: absolute;
+            top: 5px;
+            right: -14px;
+
+            &__number {
+                min-width: 16px;
+                display: inline-block;
+                text-align: center;
+                padding: 1px 2px 1px 2px;
+                background-color: red; /* you could use a background image if you'd like as well */
+                color: white;
+                font-weight: bold;
+                border-radius: 3px;
+            }
+        }
+
+        &__content {
+            padding: 0;
+            margin-top: 10px;
+            width: 400px;
+
+            &:after {
+                content: '';
+                position: absolute;
+                border-style: solid;
+                display: block;
+                width: 0;
+                top: -9px;
+                right: 9px;
+                border-color: @white transparent;
+                border-width: 0 10px 10px;
+            }
+
+            & > div {
+                line-height: normal;
+                padding: 0;
+                &:hover {
+                    background-color: transparent;
+                }
+            }
+
+            &__container {
+                position: relative;
+                overflow: hidden;
+
+
+                md-divider {
+                    width: 100%;
+                }
+
+                &__settings {
+                    position: absolute;
+                    width: 100%;
+                    height: 100%;
+                    top: 0;
+                    right: -100%;
+                    background-color: white;
+                    transition: .1s transform, .1s all;
+
+                    &--visible {
+                        right: 0;
+                        transition: .1s transform, .1s all;
+                    }
+                }
+
+                &__notifications {
+                    & > div&__settings {
+                        cursor: default;
+                    }
+
+                    &__settings {
+                        position: relative;
+                        height: 52px;
+                        padding: 0 20px;
+
+                        &__title {
+                            width: 100%;
+                            font-size: 14px;
+                            color: @grey600;
+                        }
+
+                        &__icon {
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            height: 100%;
+
+                            &__image {
+                                cursor: pointer;
+                                margin-left: 20px;
+                                opacity: 0.8;
+                                width: 20px;
+                                height: 20px;
+
+                                &--back {
+                                    width: 25px;
+                                    height: 25px;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

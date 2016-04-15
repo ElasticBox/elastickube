@@ -1,0 +1,31 @@
+<div ng-repeat="group in ctrl.notificationGroups track by $index">
+    <div layout="column" layout-align="center center">
+        <div class="ek-notifications-list__group">
+            <div class="ek-notifications-list__group__date" layout="row" layout-align="start center">
+                {{ group.date }}
+            </div>
+            <div ng-repeat="notification in group.notifications track by $index"
+                 layout="row" layout-align="start center"
+                 class="ek-notifications-list__group__notification ek-notifications-list__group__notification--{{ notification.state }}">
+                <ek-avatar class="ek-notifications-list__group__notification__avatar"
+                           workspace="notification.user"></ek-avatar>
+                <div layout="column" layout-align="center start"
+                     class="ek-notifications-list__group__notification__info">
+                    <p class="ek-notifications-list__group__notification__info__line">
+                        <span class="ek-notifications-list__group__notification__info__line__user">{{:: ctrl.getUserName(notification.user) }}</span>
+                        {{:: notification.description }}
+                    </p>
+                    <div class="ek-notifications-list__group__notification__info__kind"
+                         layout="row"
+                         layout-align="center start">
+                        <md-icon
+                                class="ek-notifications-list__group__notification__info__kind__icon"
+                                md-svg-src="{{:: NotificationIconLookup[notification.kind] }}"></md-icon>
+                        <p class="ek-notifications-list__group__notification__info__kind__date">
+                            {{ ctrl.getNotificationDate(notification) }} ago</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

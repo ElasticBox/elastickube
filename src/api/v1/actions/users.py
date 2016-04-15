@@ -56,7 +56,8 @@ class UsersActions(object):
         if not user:
             raise ObjectNotFoundError("User %s not found." % document["_id"])
 
-        updated_user = yield Query(self.database, "Users").update(document)
+        user.update(document)
+        updated_user = yield Query(self.database, "Users").update(user)
         raise Return(updated_user)
 
     @coroutine

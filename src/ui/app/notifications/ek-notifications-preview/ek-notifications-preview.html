@@ -1,0 +1,31 @@
+<div class="ek-notifications-preview__container" ek-infinite-scroll="ctrl.loadMore()">
+    <div layout="column" ng-repeat="notification in ctrl.notifications track by $index">
+        <div layout="row" layout-align="start center"
+             class="ek-notifications-preview__container__notification ek-notifications-preview__container__notification--{{ notification.state }}">
+            <ek-avatar class="ek-notifications-preview__container__notification__avatar"
+                       workspace="notification.user"></ek-avatar>
+            <div layout="column" layout-align="center start"
+                 class="ek-notifications-preview__container__notification__info">
+                <div layout="row" layout-align="center start">
+                    <p class="ek-notifications-preview__container__notification__info__line">
+                        <span class="ek-notifications-preview__container__notification__info__line__user">{{:: ctrl.getUserName(notification.user) }}</span>
+                        {{:: notification.description }}
+                    </p>
+                </div>
+                <div class="ek-notifications-preview__container__notification__info__kind"
+                     layout="row"
+                     layout-align="center start">
+                    <md-icon
+                            class="ek-notifications-preview__container__notification__info__kind__icon"
+                            md-svg-src="{{:: NotificationIconLookup[notification.kind] }}"></md-icon>
+                    <p class="ek-notifications-preview__container__notification__info__kind__date">
+                        {{ ctrl.getNotificationDate(notification) }} ago</p>
+                </div>
+            </div>
+        </div>
+        <md-divider></md-divider>
+    </div>
+</div>
+<div class="ek-notifications-preview__see-all" layout="row" layout-align="center center">
+    <p ng-click="ctrl.seeAll()">SEE ALL</p>
+</div>

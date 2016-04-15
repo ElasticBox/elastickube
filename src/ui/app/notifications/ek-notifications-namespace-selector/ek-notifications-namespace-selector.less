@@ -1,0 +1,34 @@
+@import "../../colors";
+
+.ek-notifications-namespace-selector {
+
+    &__namespace {
+        height: 30px;
+        cursor: pointer;
+        position: relative;
+        padding: 0 30px;
+
+        &__counter {
+            font-size: 11px;
+            color: @grey600;
+            font-weight: normal;
+        }
+        &:hover {
+            background: @grey100;
+        }
+        &--selected {
+            color: @cyan500;
+            font-weight: bold;
+
+            &:before {
+                content: ' ';
+                position: absolute;
+                left: 0;
+                top: 3px;
+                height: 24px;
+                width: 4px;
+                background-color: @cyan400;
+            }
+        }
+    }
+}

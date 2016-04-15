@@ -1,0 +1,27 @@
+<ek-header-layout>
+    <div transclude-to="header" layout="row" layout-align="start center">
+        <h3 class="ek-notifications__title ek-title"><span>notifications</span></h3>
+        <div ek-ink-ripple="dark" layout="column" layout-align="center" ng-click="ctrl.markAllAsRead()"
+             class="ek-notifications__mark-all-as-read">Mark all as read</div>
+    </div>
+
+    <ek-sidenav-layout transclude-to="body" fill-parent>
+        <div transclude-to="sidenav" class="ek-notifications__filters">
+            <ek-notifications-filters notifications-to-filter="ctrl.notifications"
+                                      filtered-notifications="ctrl.notificationsFilteredByNamespace"></ek-notifications-filters>
+        </div>
+
+        <div class="ek-notifications__body" transclude-to="body" fill-parent>
+            <div class="ek-notifications__body__not-found-message" fill-parent
+                 layout="column" layout-align="center center"
+                 ng-if="ctrl.showEmpty">No notification found
+            </div>
+
+            <div ng-if="!ctrl.showEmpty" ng-switch="ctrl.selectedView">
+                <ek-notifications-list notifications="ctrl.notificationsFilteredByNamespace"
+                                       ek-infinite-scroll="ctrl.loadMore()"></ek-notifications-list>
+            </div>
+        </div>
+    </ek-sidenav-layout>
+
+</ek-header-layout>

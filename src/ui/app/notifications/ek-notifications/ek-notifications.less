@@ -1,0 +1,35 @@
+@import "../../colors";
+
+.ek-notifications {
+
+    background-color: @grey150;
+
+    &__mark-all-as-read {
+        cursor: pointer;
+        font-weight: bold;
+        padding: 7px 13px;
+        border: 1px solid @grey400;
+        background-color: @grey100;
+    }
+
+    &__filters {
+        margin-top: 20px;
+    }
+
+    &__title {
+        width: 190px;
+    }
+
+    &__body {
+
+        &__not-found-message {
+            background-color: @grey100;
+            color: @grey600;
+        }
+
+        ek-notifications-list {
+            padding: 20px 10%;
+        }
+
+    }
+}

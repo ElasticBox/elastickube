@@ -25,6 +25,7 @@ import chartsModule from 'charts/module';
 import dashboardModule from 'dashboard/module';
 import instancesModule from 'instances/module';
 import loginModule from 'login/module';
+import notificationsModule from 'notifications/module';
 
 import baseRoutes from './config/base-routes';
 import animateConfig from './config/animate-config';
@@ -48,7 +49,8 @@ angular
         chartsModule,
         dashboardModule,
         instancesModule,
-        loginModule
+        loginModule,
+        notificationsModule
     ])
 
     .config(animateConfig)

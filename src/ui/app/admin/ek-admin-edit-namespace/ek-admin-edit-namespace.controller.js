@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 class AdminEditNamespaceController {
-    constructor($scope, principalStore, usersStore, namespacesActionCreator) {
+    constructor($scope, usersStore, namespacesActionCreator) {
         'ngInject';
 
         this._namespacesActionCreator = namespacesActionCreator;
@@ -23,7 +23,7 @@ class AdminEditNamespaceController {
         this.labels = _.get(this.namespace, 'metadata.labels') || {};
         this.namespaceName = _.get(this.namespace, 'metadata.name');
         this.users = this.namespace ? _.map(this.namespace.members, (username) => usersStore.get(username))
-            : [principalStore.getPrincipal()];
+            : [usersStore.getPrincipal()];
 
         $scope.$watchGroup(['ctrl.form.$valid', 'ctrl.users'], ([isValid, users]) => {
             this.dialogController.canAccept = isValid && _.size(users) > 0;

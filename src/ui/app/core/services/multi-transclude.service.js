@@ -39,10 +39,13 @@ class MultiTranscludeService {
 
 function getAttribute(item, attributeName) {
     const attribute = item.attributes[attributeName];
+    let value;
 
     if (angular.isDefined(attribute)) {
-        return attribute.value;
+        value = attribute.value;
     }
+
+    return value;
 }
 
 export default MultiTranscludeService;
