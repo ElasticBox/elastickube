@@ -110,10 +110,15 @@ class GitSync(object):
                 yield Query(self.database, 'Charts').remove(existing)
             else:
                 discovered["_id"] = existing["_id"]
+                discovered["metadata"] = existing["metadata"]
 
                 if discovered["commit"] != existing["commit"]:
                     logging.debug("Updating existing chart %(name)s", discovered)
-                    yield Query(self.database, "Charts").update(discovered)
+
+                    try:
+                        yield Query(self.database, "Charts").update(discovered)
+                    except Exception as error:
+                        logging.exception("Failed to update chart %(name)s", discovered)
 
         for path, discovered in discovered_charts.iteritems():
             if discovered and "_id" not in discovered:
@@ -121,7 +126,7 @@ class GitSync(object):
                 try:
                     yield Query(self.database, "Charts").insert(discovered)
                 except:
-                    logging.error("Failed to insert chart %(name)s", discovered)
+                    logging.exception("Failed to insert chart %(name)s", discovered)
 
         self.charts = discovered_charts
 
