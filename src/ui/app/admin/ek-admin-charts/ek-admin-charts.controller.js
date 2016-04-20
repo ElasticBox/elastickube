@@ -39,7 +39,7 @@ class AdminChartsController {
                 {
                     name: 'maintainers',
                     field: 'maintainers',
-                    cellTemplate: `<div>{{ item.maintainers[0] }}</div>`,
+                    cellTemplate: `<div>{{ item.maintainers && item.maintainers[0] }}</div>`,
                     sortingAlgorithm: (a, b) => {
                         const sizeA = _.first(a.maintainers);
                         const sizeB = _.first(b.maintainers);
