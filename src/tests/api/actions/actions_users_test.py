@@ -23,7 +23,7 @@ from motor.motor_tornado import MotorClient
 from tornado import testing
 from tornado.websocket import websocket_connect
 
-from tests.api import get_ws_request, validate_response, wait_message
+from tests.api import get_ws_request, validate_response, wait_message, get_api_address
 
 
 class ActionsUsersTests(testing.AsyncTestCase):
@@ -44,7 +44,7 @@ class ActionsUsersTests(testing.AsyncTestCase):
 
     @testing.gen_test
     def _delete_user(self):
-        database = MotorClient("mongodb://localhost:27017/").elastickube
+        database = MotorClient("mongodb://%s:27017/" % get_api_address()).elastickube
         yield database.Users.remove({"_id": ObjectId(self.user_id)})
 
     @testing.gen_test(timeout=60)

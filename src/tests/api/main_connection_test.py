@@ -22,7 +22,7 @@ from tornado import testing
 from tornado.httpclient import HTTPRequest
 from tornado.websocket import websocket_connect
 
-from tests.api import ELASTICKUBE_TOKEN_HEADER
+from tests.api import ELASTICKUBE_TOKEN_HEADER, get_api_address
 
 
 class MainConnectionTest(testing.AsyncTestCase):
@@ -34,7 +34,7 @@ class MainConnectionTest(testing.AsyncTestCase):
         logging.debug("Start test_main_connection")
 
         request = HTTPRequest(
-            "ws://localhost/api/v1/ws",
+            "ws://%s/api/v1/ws" % get_api_address(),
             headers=dict([(ELASTICKUBE_TOKEN_HEADER, 'fake_token')]),
             validate_cert=False
         )

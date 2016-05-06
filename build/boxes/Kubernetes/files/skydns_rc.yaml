@@ -48,7 +48,7 @@ spec:
         args:
         # command = "/kube2sky"
         - --domain={{ KUBELET_DOMAIN }}
-        - --kube_master_url=http://10.107.56.115:{{ KUBE_INSECURE_API_PORT }}
+        - --kube_master_url=http://{{ KUBE_API_ADDRESS }}:{{ KUBE_INSECURE_API_PORT }}
       - name: skydns
         image: gcr.io/google_containers/skydns:2015-10-13-8c72f8c
         resources:

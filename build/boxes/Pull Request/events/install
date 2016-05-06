@@ -1,0 +1,18 @@
+#!/bin/bash
+
+export PATH=$PATH:/usr/local/bin
+
+echo "==> Register mongodb repository"
+apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927
+echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.2 multiverse" > /etc/apt/sources.list.d/mongodb-org-3.2.list
+
+echo "==> Register Node 12 repository"
+curl -sL https://deb.nodesource.com/setup_0.12 | bash 
+
+# apt-get update is executed as part of the the node repository setup script
+echo "==> Install Node JS and Mongo"
+apt-get -y install nodejs mongodb-org-shell python-dev python-pycurl libcurl4-openssl-dev libffi-dev
+
+echo "==> Install pip"
+curl -sL 'https://bootstrap.pypa.io/get-pip.py' | python
+pip install motor

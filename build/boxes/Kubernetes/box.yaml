@@ -11,6 +11,11 @@ variables:
   type: Text
   value: ''
   visibility: public
+- name: KUBE_API_ADDRESS
+  required: false
+  type: Text
+  value: '10.107.56.115'
+  visibility: public
 - name: KUBE_INSECURE_API_PORT
   required: false
   type: Port

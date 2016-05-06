@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+import os
 import json
 
 from tornado.gen import coroutine, Return
@@ -25,7 +26,7 @@ ELASTICKUBE_TOKEN_HEADER = "ElasticKube-Token"
 @coroutine
 def get_token(io_loop, username="operations@elasticbox.com", password="elastickube123"):
     response = yield AsyncHTTPClient(io_loop).fetch(
-        "http://localhost/api/v1/auth/login",
+        "http://%s/api/v1/auth/login" % get_api_address(),
         method="POST",
         body=json.dumps(dict(username=username, password=password)))
 
@@ -36,7 +37,7 @@ def get_token(io_loop, username="operations@elasticbox.com", password="elasticku
 def get_ws_request(io_loop, username="operations@elasticbox.com", password="elastickube123"):
     token = yield get_token(io_loop, username, password)
     request = HTTPRequest(
-        "ws://localhost/api/v1/ws",
+        "ws://%s/api/v1/ws" % get_api_address(),
         headers=dict([(ELASTICKUBE_TOKEN_HEADER, token)]),
         validate_cert=False
     )
@@ -54,6 +55,10 @@ def wait_message(connection, correlation):
             break
 
     raise Return(deserialized_message)
+
+
+def get_api_address():
+    return os.getenv("ELASTICKUBE_API_ADDRESS", "localhost")
 
 
 def validate_response(test_case, message, expected_result):

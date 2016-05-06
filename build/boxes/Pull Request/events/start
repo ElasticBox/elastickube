@@ -1,0 +1,89 @@
+#!/bin/bash -e
+
+# Build the UI
+pushd "{{ ELASTICKUBE_PATH }}/src/ui"
+npm install
+npm run build:production
+popd
+
+# Build and deploy ElasticKube
+pushd "{{ ELASTICKUBE_PATH }}/build/kubegrunt"
+bash "{{ ELASTICKUBE_PATH }}/build/kubegrunt/kube-setup.sh"
+popd
+
+# Wait for mongo to be up
+echo -n "Initializing"
+until mongo admin --eval "db.system.users.find();" > /dev/null 2>&1
+do
+    echo -n "."
+    sleep 10;
+done
+echo ""
+
+# Ensure user exists in elastickube database
+mongo admin << \
+"______________________MONGO_SCRIPT______________________"
+var status = rs.status();
+
+if (status.ok === 0 && status.code !== 13) {
+  var result = rs.initiate({
+      _id:'elastickube',
+      version:1,
+      members:[ { _id:0, host:'localhost:27017' } ]
+  });
+
+  if (result.ok !== 1) {
+    print('Cannot initialize replica set:')
+    printjson(status);
+    quit(1);
+  }
+}
+
+// Wait for the replicat to initiate
+sleep(1000);
+
+// Create user
+use elastickube
+
+if (db.Users.findOne({ 'email': 'operations@elasticbox.com'}) == null) {
+  db.Users.insert({
+    email             : 'operations@elasticbox.com',
+    email_validated_at: new Date(),
+    firstname         : 'Admin',
+    lastname          : 'Elasticbox',
+    metadata          : {
+        creationTimestamp: new Date(),
+        deletionTimestamp: null,
+        resourceVersion  : new Date()
+    },
+    password          : {
+        hash: '$6$rounds=40000$xiS1Mf2FHUXk19Or$IF/jxf.DngKpNRukL6kQPFMFoA2vy3TX9/tQpzvJ09SXwsxXB9Ly3fm79BkWjDUDVDXot1WUwBe/L0QshDEju/',
+        salt: 'NQVX38P0C6UGJQSQBDSR0UC00IHUMTBDJGGP6PGEYGTZ84FRM2XERXX5OAPUCM8X'
+    },
+    role              : 'administrator',
+    schema            : 'http://elasticbox.net/schemas/user',
+    username          : 'operations@elasticbox.com',
+  });
+}
+
+if (db.Users.findOne({ 'email': 'engineer@elasticbox.com'}) == null) {
+  db.Users.insert({
+    email             : 'engineer@elasticbox.com',
+    email_validated_at: new Date(),
+    firstname         : 'Engineer',
+    lastname          : 'Elasticbox',
+    metadata          : {
+        creationTimestamp: new Date(),
+        deletionTimestamp: null,
+        resourceVersion  : new Date()
+    },
+    password          : {
+        hash: '$6$rounds=40000$xiS1Mf2FHUXk19Or$IF/jxf.DngKpNRukL6kQPFMFoA2vy3TX9/tQpzvJ09SXwsxXB9Ly3fm79BkWjDUDVDXot1WUwBe/L0QshDEju/',
+        salt: 'NQVX38P0C6UGJQSQBDSR0UC00IHUMTBDJGGP6PGEYGTZ84FRM2XERXX5OAPUCM8X'
+    },
+    role              : 'user',
+    schema            : 'http://elasticbox.net/schemas/user',
+    username          : 'engineer@elasticbox.com',
+  });
+}
+______________________MONGO_SCRIPT______________________

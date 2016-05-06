@@ -23,7 +23,7 @@ from tornado import testing
 from tornado.httpclient import AsyncHTTPClient
 from tornado.websocket import websocket_connect
 
-from tests.api import wait_message, get_ws_request, validate_response
+from tests.api import wait_message, get_ws_request, get_api_address, validate_response
 
 ELASTICKUBE_VALIDATION_TOKEN_HEADER = "ElasticKube-Validation-Token"
 
@@ -34,7 +34,7 @@ class ActionsInvitationsTests(testing.AsyncTestCase):
 
     @staticmethod
     def _delete_user(email):
-        database = MongoClient("mongodb://localhost:27017/").elastickube
+        database = MongoClient("mongodb://%s:27017/" % get_api_address()).elastickube
         database.Users.remove({"email": email})
 
     @testing.gen_test(timeout=60)
@@ -64,14 +64,14 @@ class ActionsInvitationsTests(testing.AsyncTestCase):
             message,
             dict(status_code=200, correlation=correlation, operation="created", action="invitations"))
 
-        database = MongoClient("mongodb://localhost:27017/").elastickube
+        database = MongoClient("mongodb://%s:27017/" % get_api_address()).elastickube
         user = database.Users.find_one({"email": user_email})
 
         invitation_token = user["invite_token"]
 
         data = dict(email=user_email, password="elastickube123", firstname="firstname", lastname="lastname")
         yield AsyncHTTPClient(self.io_loop).fetch(
-            "http://localhost/api/v1/auth/signup",
+            "http://%s/api/v1/auth/signup" % get_api_address(),
             method='POST',
             headers={ELASTICKUBE_VALIDATION_TOKEN_HEADER: invitation_token},
             body=json.dumps(data))

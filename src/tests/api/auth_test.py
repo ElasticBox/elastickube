@@ -20,6 +20,8 @@ import logging
 from tornado import testing
 from tornado.httpclient import HTTPError, AsyncHTTPClient
 
+from tests import api
+
 
 class AuthTests(testing.AsyncTestCase):
 
@@ -29,7 +31,7 @@ class AuthTests(testing.AsyncTestCase):
     def test_auth_providers(self):
         logging.debug("Start test_auth_providers")
 
-        response = yield AsyncHTTPClient(self.io_loop).fetch("http://localhost/api/v1/auth/providers")
+        response = yield AsyncHTTPClient(self.io_loop).fetch("http://%s/api/v1/auth/providers" % api.get_api_address())
         auth_providers = json.loads(response.body)
         self.assertTrue(len(auth_providers.keys()) >= 1, "No auth methods enabled %s" % auth_providers)
 
@@ -48,7 +50,7 @@ class AuthTests(testing.AsyncTestCase):
         error = None
         try:
             yield AsyncHTTPClient(self.io_loop).fetch(
-                "http://localhost/api/v1/auth/signup",
+                "http://%s/api/v1/auth/signup" % api.get_api_address(),
                 method="POST",
                 body=json.dumps({})
             )
@@ -65,7 +67,7 @@ class AuthTests(testing.AsyncTestCase):
         logging.debug("Start test_login_success")
 
         response = yield AsyncHTTPClient(self.io_loop).fetch(
-            "http://localhost/api/v1/auth/login",
+            "http://%s/api/v1/auth/login" % api.get_api_address(),
             method='POST',
             body=json.dumps(dict(username="operations@elasticbox.com", password="elastickube123")))
 
@@ -79,7 +81,7 @@ class AuthTests(testing.AsyncTestCase):
         error = None
         try:
             yield AsyncHTTPClient(self.io_loop).fetch(
-                "http://localhost/api/v1/auth/login",
+                "http://%s/api/v1/auth/login" % api.get_api_address(),
                 method='POST',
                 body=json.dumps(dict(username="operations@elasticbox.com", password="elastickube2")))
         except HTTPError as http_error:

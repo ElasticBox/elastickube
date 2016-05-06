@@ -22,7 +22,7 @@ from tornado import testing
 from tornado.httpclient import HTTPRequest
 from tornado.websocket import websocket_connect
 
-from tests.api import get_token, wait_message, ELASTICKUBE_TOKEN_HEADER
+from tests.api import get_token, wait_message, get_api_address, ELASTICKUBE_TOKEN_HEADER
 
 
 class WatchNamespacesTest(testing.AsyncTestCase):
@@ -33,7 +33,7 @@ class WatchNamespacesTest(testing.AsyncTestCase):
 
         token = yield get_token(self.io_loop)
         request = HTTPRequest(
-            "ws://localhost/api/v1/ws",
+            "ws://%s/api/v1/ws" % get_api_address(),
             headers=dict([(ELASTICKUBE_TOKEN_HEADER, token)]),
             validate_cert=False
         )
