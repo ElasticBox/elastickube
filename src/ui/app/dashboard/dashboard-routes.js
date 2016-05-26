@@ -15,36 +15,29 @@ limitations under the License.
 */
 
 const states = [{
-    state: 'charts',
+    state: 'dashboard',
     config: {
         parent: 'private',
-        template: '<ek-charts flex></ek-charts>',
-        url: '/:namespace/charts',
+        template: '<ek-dashboard flex></ek-dashboard>',
+        url: '/:namespace/dashboard',
         data: {
             header: {
-                name: 'charts',
-                position: 3,
+                name: 'dashboard',
+                position: 1,
                 click: ($injector) => {
-                    const actionCreator = $injector.get('chartsNavigationActionCreator');
+                    const actionCreator = $injector.get('dashboardNavigationActionCreator');
 
-                    return actionCreator.charts();
-                }
-            },
-            resolve: {
-                loading: ($q, chartsStore, namespacesStore) => {
-                    'ngInject';
-
-                    return $q.all([chartsStore.isLoading(), namespacesStore.isLoading()]);
+                    return actionCreator.dashboard();
                 }
             }
         }
     }
 }];
 
-function chartsRoutes(routerHelperProvider) {
+function dashboardRoutes(routerHelperProvider) {
     'ngInject';
 
     routerHelperProvider.configureStates(states);
 }
 
-export default chartsRoutes;
+export default dashboardRoutes;

@@ -35,6 +35,8 @@ import InstancesActionCreatorService from './dataflow/instances-action-creator.s
 import InstancesStoreService from './dataflow/instances-store.service.js';
 import LogActionCreatorService from './dataflow/log-action-creator.service.js';
 import LogStoreService from './dataflow/log-store.service.js';
+import MetricsActionCreatorService from './dataflow/metrics-action-creator.service.js';
+import MetricsStoreService from './dataflow/metrics-store.service.js';
 import NamespacesActionCreatorService from './dataflow/namespaces-action-creator.service.js';
 import NamespacesStoreService from './dataflow/namespaces-store.service.js';
 import SessionActionCreatorService from './dataflow/session-action-creator.service';
@@ -94,6 +96,9 @@ angular
 
     .service('logActionCreator', LogActionCreatorService)
     .service('logStore', LogStoreService)
+
+    .service('metricsActionCreator', MetricsActionCreatorService)
+    .service('metricsStore', MetricsStoreService)
 
     .service('namespacesActionCreator', NamespacesActionCreatorService)
     .service('namespacesStore', NamespacesStoreService)

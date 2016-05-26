@@ -31,7 +31,7 @@ function instancesRoutes(routerHelperProvider) {
             data: {
                 header: {
                     name: 'instances',
-                    position: 1,
+                    position: 2,
                     click: ($injector) => {
                         const actionCreator = $injector.get('instancesNavigationActionCreator');
 

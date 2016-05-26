@@ -1,0 +1,10 @@
+<div class="ek-dashboard-linechart__container" layout="column">
+    <div class="ek-dashboard-linechart__container__title" layout="row" layout-align="start center">
+        {{ ctrl.title }}
+    </div>
+    <div ng-if="ctrl.initialized" class="ek-dashboard-linechart__container__svg">
+    </div>
+    <div ng-if="!ctrl.initialized" class="ek-dashboard-linechart__container__loading" layout="row" layout-align="center center">
+        <md-progress-circular md-mode="indeterminate" md-diameter="100"></md-progress-circular>
+    </div>
+</div>

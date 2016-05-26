@@ -21,9 +21,10 @@ import layoutModule from 'layout/module';
 import widgetsModule from 'widgets/module';
 
 import adminModule from 'admin/module';
+import chartsModule from 'charts/module';
+import dashboardModule from 'dashboard/module';
 import instancesModule from 'instances/module';
 import loginModule from 'login/module';
-import chartsModule from 'charts/module';
 
 import baseRoutes from './config/base-routes';
 import animateConfig from './config/animate-config';
@@ -44,9 +45,10 @@ angular
 
         /* Feature areas */
         adminModule,
+        chartsModule,
+        dashboardModule,
         instancesModule,
-        loginModule,
-        chartsModule
+        loginModule
     ])
 
     .config(animateConfig)

@@ -1,0 +1,36 @@
+<ek-header-layout>
+    <div transclude-to="header" layout="row" layout-align="start center">
+        <h3 class="ek-dashboard__title ek-title"><span>{{ ctrl.namespace.name }}</span></h3>
+    </div>
+    <div transclude-to="body" layout="column" flex>
+        <md-content class="ek-dashboard__content" fill-parent>
+            <div layout="row" layout-align="center start" layout-wrap>
+                <ek-dashboard-card title="Replication Controllers" flex>
+                    <h1>{{ ctrl.statistics.replicationControllers.total || 0 }}</h1>
+                    <h2>{{ ctrl.statistics.replicationControllers.replicas || 0}} Replicas</h2>
+                </ek-dashboard-card>
+                <ek-dashboard-card title="Services" flex>
+                    <h1>{{ ctrl.statistics.services.total || 0 }}</h1>
+                    <h2>{{ ctrl.statistics.pods.total || 0 }} Pods Selected</h2>
+                </ek-dashboard-card>
+                <ek-dashboard-card title="Containers" flex>
+                    <h1>{{ ctrl.statistics.pods.containers.total || 0 }}</h1>
+                    <h2>{{ ctrl.statistics.pods.containers.containerTypes.size || 0 }} Images</h2>
+                </ek-dashboard-card>
+                <ek-dashboard-card title="Members" flex>
+                    <h1>{{ ctrl.namespace.members.ss || 0}}</h1>
+                </ek-dashboard-card>
+            </div>
+            <div layout="row" layout-align="center start" layout-wrap>
+                <ek-dashboard-linechart title="CPU (%)" percentage="true" dataset="ctrl.metricsData"
+                                        datafield="data.cpu_ratio"
+                                        units="%"
+                                        line-color="#BA68C8" flex></ek-dashboard-linechart>
+                <ek-dashboard-linechart title="Memory (%)" percentage="true" dataset="ctrl.metricsData"
+                                        datafield="data.mem_ratio"
+                                        units="%"
+                                        line-color="#3F51B5" flex></ek-dashboard-linechart>
+            </div>
+        </md-content>
+    </div>
+</ek-header-layout>

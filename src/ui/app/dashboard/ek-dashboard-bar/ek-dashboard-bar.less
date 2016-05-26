@@ -1,0 +1,31 @@
+@import "../../colors";
+
+.ek-dashboard-bar {
+
+    padding: 5px;
+    background-color: @white;
+
+    &__container {
+        min-height: 25px;
+        width: 100%;
+
+        &__value {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 40px;
+            max-width: 40px;
+        }
+
+        &__svg {
+            width: 650px;
+            height: 25px;
+            svg {
+                margin-left: 10px;
+                rect {
+                    opacity: 0.2;
+                }
+            }
+        }
+    }
+}
