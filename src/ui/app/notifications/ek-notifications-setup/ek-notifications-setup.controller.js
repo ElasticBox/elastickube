@@ -15,12 +15,13 @@ limitations under the License.
 */
 
 class NotificationsSetupController {
-    constructor($scope, usersActionCreator, usersStore) {
+    constructor($scope, notificationsActionCreator, usersStore) {
         'ngInject';
 
         const onChange = () => this.principal = angular.copy(this._usersStore.getPrincipal());
 
         this._usersStore = usersStore;
+        this._notificationsActionCreator = notificationsActionCreator;
 
         this._usersStore.addPrincipalChangeListener(onChange);
         this.principal = angular.copy(this._usersStore.getPrincipal());
@@ -28,7 +29,7 @@ class NotificationsSetupController {
 
         $scope.$watch('ctrl.principal.notifications', (newValue, oldValue) => {
             if (!_.isEqual(newValue, oldValue)) {
-                usersActionCreator.update(this.principal);
+                this._notificationsActionCreator.emailSetting(this.principal.notifications.namespace);
             }
         }, true);
     }

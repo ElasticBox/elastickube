@@ -64,6 +64,17 @@ class InvitationsActions(object):
             "confirm_url": "%s/invite/%s" % (hostname, invite_user["invite_token"])
         }
 
+        notification = {
+            "user": self.user["username"],
+            "operation": "create",
+            "resource": {
+                "kind": "User",
+                "name": email_address
+            },
+            "namespace": namespace
+        }
+        yield Query(self.database, "Notifications").insert(notification)
+
         raise Return(invite_info)
 
     @coroutine

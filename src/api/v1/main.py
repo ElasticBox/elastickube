@@ -25,6 +25,7 @@ from api.v1 import SecureWebSocketHandler
 from api.v1.actions.logs import LogsActions
 from api.v1.actions.instances import InstancesActions
 from api.v1.actions.namespaces import NamespacesActions
+from api.v1.actions.notifications import NotificationsActions
 from api.v1.actions.settings import SettingsActions
 from api.v1.actions.users import UsersActions
 from api.v1.actions.invitations import InvitationsActions
@@ -44,7 +45,8 @@ SUPPORTED_ACTIONS = [
     "invitations",
     "charts",
     "logs",
-    "metrics"
+    "metrics",
+    "notifications"
 ]
 
 
@@ -257,6 +259,10 @@ class MainWebSocketHandler(SecureWebSocketHandler):
             ),
             invitations=dict(
                 rest=InvitationsActions(self.settings, self.user),
+            ),
+            notifications=dict(
+                rest=NotificationsActions(self.settings, self.user),
+                watcher_cls=CursorWatcher
             ),
         )
 

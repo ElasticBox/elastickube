@@ -26,6 +26,8 @@ class NotificationsStoreService extends AbstractStore {
 
         this._actions = actions;
         this._notifications = [];
+        this._namespacesUnread = [];
+        this._totalUnread = 0;
 
         this.dispatchToken = dispatcher.register((action) => {
             switch (action.type) {
@@ -36,17 +38,27 @@ class NotificationsStoreService extends AbstractStore {
                     break;
 
                 case this._actions.NOTIFICATION_UPDATED:
-                    this._setNotification(action.notification);
                     this.emit(CHANGE_EVENT);
                     break;
 
                 case this._actions.NOTIFICATIONS_UPDATED:
-                    this._setNotificationState(action.state);
                     this.emit(CHANGE_EVENT);
                     break;
 
                 case this._actions.NOTIFICATIONS_LOADED:
                     this._loadedOldNotifications(action.notifications);
+                    this.emit(CHANGE_EVENT);
+                    break;
+
+                case this._actions.NOTIFICATIONS_VIEWED:
+                    this._totalUnread = 0;
+                    this._namespacesUnread = [];
+                    this.emit(CHANGE_EVENT);
+                    break;
+
+                case this._actions.NOTIFICATION_CREATED:
+                case this._actions.NOTIFICATIONS_CREATED:
+                    this._setNotification(action.notification);
                     this.emit(CHANGE_EVENT);
                     break;
 
@@ -56,33 +68,29 @@ class NotificationsStoreService extends AbstractStore {
     }
 
     _setNotifications(notifications) {
-        this._notifications = notifications.notifications;
-        this._totalUnread = notifications.totalUnread;
+        this._notifications = notifications.latest;
+        this._totalUnread = notifications.total_unread;
+        this._namespacesUnread = notifications.unread_namespaces;
     }
 
     _setNotification(notification) {
-        const index = _.findIndex(this._notifications, _.pick(notification.notification, 'id'));
+        const index = _.findIndex(this._notifications, _.pick(notification.notification, '_id'));
 
-        if (index !== -1) {
-            this._notifications.splice(index, 1, notification.notification);
+        if (index === -1) {
+            this._notifications.unshift(notification.notification);
         }
-        this._totalUnread = notification.totalUnread;
+        this._totalUnread = notification.total_unread;
+        this._namespacesUnread = notification.unread_namespaces;
     }
 
-    _setNotificationState(state) {
-        _.each(this._notifications, (notification) => {
-            if (state === 'read') {
-                notification.state = 'read';
-            } else if (notification.state === 'new') {
-                notification.state = 'seen';
+    _loadedOldNotifications(notifications) {
+        const oldNotifications = _.get(notifications, 'body', []);
+
+        if (oldNotifications.length > 0) {
+            if (_.last(this._notifications).metadata.creationTimestamp > oldNotifications[0].metadata.creationTimestamp) {
+                this._notifications = this._notifications.concat(oldNotifications);
             }
-        });
-        this._totalUnread = 0;
-    }
-
-    _loadedOldNotifications(oldNotifications) {
-        this._notifications = this._notifications.concat(oldNotifications.notifications);
-        this._totalUnread = oldNotifications.totalUnread;
+        }
     }
 
     getAll() {
@@ -97,8 +105,18 @@ class NotificationsStoreService extends AbstractStore {
         return _.last(this._notifications);
     }
 
+    getCurrentNewestNotification() {
+        return _.first(this._notifications);
+    }
+
     getTotalUnreadCount() {
         return this._totalUnread;
+    }
+
+    getUnreadNamespace(namespace) {
+        const unreadNamespace = _.find(this._namespacesUnread, { name: namespace });
+
+        return unreadNamespace && unreadNamespace.unread;
     }
 
     addChangeListener(callback) {

@@ -1,15 +1,16 @@
 <div class="ek-notifications-preview__container" ek-infinite-scroll="ctrl.loadMore()">
     <div layout="column" ng-repeat="notification in ctrl.notifications track by $index">
         <div layout="row" layout-align="start center"
-             class="ek-notifications-preview__container__notification ek-notifications-preview__container__notification--{{ notification.state }}">
+             class="ek-notifications-preview__container__notification ek-notifications-preview__container__notification--{{ ctrl.getNotificationState(notification) }}">
             <ek-avatar class="ek-notifications-preview__container__notification__avatar"
                        workspace="notification.user"></ek-avatar>
             <div layout="column" layout-align="center start"
                  class="ek-notifications-preview__container__notification__info">
                 <div layout="row" layout-align="center start">
                     <p class="ek-notifications-preview__container__notification__info__line">
-                        <span class="ek-notifications-preview__container__notification__info__line__user">{{:: ctrl.getUserName(notification.user) }}</span>
-                        {{:: notification.description }}
+                        <span class="ek-notifications-preview__container__notification__info__line__user">{{ ctrl.getUserName(notification.user) }}</span>
+                        {{ ctrl.getNotificationActionText(notification) }}
+                        <span class="ek-notifications-list__group__notification__info__line__user">{{ ctrl.getTargetResourceName(notification) }}</span>
                     </p>
                 </div>
                 <div class="ek-notifications-preview__container__notification__info__kind"
@@ -17,9 +18,9 @@
                      layout-align="center start">
                     <md-icon
                             class="ek-notifications-preview__container__notification__info__kind__icon"
-                            md-svg-src="{{:: NotificationIconLookup[notification.kind] }}"></md-icon>
+                            md-svg-src="{{:: NotificationIconLookup[notification.resource.kind] }}"></md-icon>
                     <p class="ek-notifications-preview__container__notification__info__kind__date">
-                        {{ ctrl.getNotificationDate(notification) }} ago</p>
+                        {{ notification.metadata.creationTimestamp | ekHumanizeDate: 'epoch' }} ago</p>
                 </div>
             </div>
         </div>

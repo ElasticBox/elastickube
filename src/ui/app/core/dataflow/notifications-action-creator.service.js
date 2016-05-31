@@ -23,6 +23,11 @@ class NotificationsActionCreatorService {
         this._actions = actions;
         this._notificationsAPI = notificationsAPI;
         this._dispatcher = dispatcher;
+
+        notificationsAPI.addOnCreatedListener((notification) => this._dispatcher.dispatch(
+            { type: this._actions.NOTIFICATION_CREATED, notification })
+        );
+        notificationsAPI.addOnUpdatedListener(() => this._dispatcher.dispatch({ type: this._actions.NOTIFICATIONS_UPDATED }));
     }
 
     subscribe() {
@@ -30,22 +35,6 @@ class NotificationsActionCreatorService {
 
         return this._notificationsAPI.subscribe()
             .then((notifications) => this._dispatcher.dispatch({ type: this._actions.NOTIFICATIONS_SUBSCRIBED, notifications }));
-    }
-
-    updateNotification(notificationToBeUpdated) {
-        return this._notificationsAPI.update(notificationToBeUpdated)
-            .then((notification) => this._dispatcher.dispatch({ type: this._actions.NOTIFICATION_UPDATE, notification }));
-    }
-
-    changeNotificationsState(state) {
-        const changeNotificationsStateBody = {
-            state
-        };
-
-        this._dispatcher.dispatch({ type: this._actions.NOTIFICATIONS_UPDATE });
-
-        return this._notificationsAPI.update(changeNotificationsStateBody)
-            .then(() => this._dispatcher.dispatch({ type: this._actions.NOTIFICATIONS_UPDATED, state }));
     }
 
     loadMore(lastNotification, pageSize) {
@@ -59,6 +48,20 @@ class NotificationsActionCreatorService {
         return this._notificationsAPI.loadMore(LoadMoreNotificationsBody)
             .then((notifications) => this._dispatcher.dispatch({ type: this._actions.NOTIFICATIONS_LOADED, notifications }));
     }
+
+    view(timestamp) {
+        this._dispatcher.dispatch({ type: this._actions.NOTIFICATIONS_VIEW });
+
+        return this._notificationsAPI.view(timestamp)
+            .then(() => this._dispatcher.dispatch({ type: this._actions.NOTIFICATIONS_VIEWED }));
+    }
+
+    emailSetting(timestamp) {
+        this._dispatcher.dispatch({ type: this._actions.NOTIFICATIONS_UPDATE });
+
+        return this._notificationsAPI.emailSetting(timestamp);
+    }
+
 }
 
 export default NotificationsActionCreatorService;

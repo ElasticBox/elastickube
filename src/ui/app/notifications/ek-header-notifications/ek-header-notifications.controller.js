@@ -15,13 +15,15 @@ limitations under the License.
 */
 
 class HeaderNotificationsController {
-    constructor($scope, notificationsActionCreator, notificationsStore) {
+    constructor($scope, notificationsActionCreator, notificationsStore, usersActionCreator, usersStore) {
         'ngInject';
 
         const onChange = () => this.totalUnread = this._getNotificationCount();
 
         this._notificationsStore = notificationsStore;
         this._notificationsActionCreator = notificationsActionCreator;
+        this._usersStore = usersStore;
+        this._usersActionCreator = usersActionCreator;
 
         notificationsStore.addChangeListener(onChange);
         this.closed = true;
@@ -43,8 +45,12 @@ class HeaderNotificationsController {
 
     markAllAsSeen() {
         this.closed = !this.closed;
+
         if (this.totalUnread !== 0 && !this.closed) {
-            this._notificationsActionCreator.changeNotificationsState('seen');
+            const lastNotification = this._notificationsStore.getCurrentNewestNotification();
+
+            this._notificationsActionCreator.view(lastNotification.metadata.creationTimestamp);
+            this.totalUnread = 0;
         }
     }
 

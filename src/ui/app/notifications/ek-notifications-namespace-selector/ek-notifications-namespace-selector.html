@@ -5,5 +5,5 @@
      ng-click="ctrl.selectNamespace(namespace)"
      layout="row" layout-align="space-between center">
     <span class="ek-notifications-namespace-selector__namespace__name">{{ namespace }}</span>
-    <span class="ek-notifications-namespace-selector__namespace__counter">{{ namespace === 'All' ? ctrl.notifications.length : ctrl.namespaceValues[namespace] || 0 }}</span>
+    <span class="ek-notifications-namespace-selector__namespace__counter">{{ ctrl.unreadNamespace(namespace) }}</span>
 </div>

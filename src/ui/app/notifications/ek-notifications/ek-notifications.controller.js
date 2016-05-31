@@ -40,13 +40,9 @@ class NotificationsListController {
     }
 
     _markAllAsSeen() {
-        if (this._notificationsStore.getTotalUnreadCount() > 0) {
-            this._notificationsActionCreator.changeNotificationsState('seen');
-        }
-    }
+        const lastNotification = this._notificationsStore.getCurrentNewestNotification();
 
-    markAllAsRead() {
-        this._notificationsActionCreator.changeNotificationsState('read');
+        this._notificationsActionCreator.view(lastNotification.metadata.creationTimestamp);
     }
 
     loadMore() {

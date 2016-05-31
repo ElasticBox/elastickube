@@ -31,7 +31,8 @@ class NotificationsListController {
         let current;
 
         return _.reduce(notifications, (result, notification) => {
-            const date = notification.date.isSame(moment(), 'day') ? 'Today' : notification.date.format('MM/DD/YY');
+            const notificationMoment = moment.unix(notification.metadata.creationTimestamp).local();
+            const date = notificationMoment.isSame(moment(), 'day') ? 'Today' : notificationMoment.format('MM/DD/YY');
 
             if (_.isUndefined(current) || date !== current.date) {
                 current = {
@@ -47,14 +48,73 @@ class NotificationsListController {
         }, []);
     }
 
-    getNotificationDate(notification) {
-        return this._humanizeDateFilter(notification.date);
+    getNotificationState(notification) {
+        return notification.metadata.creationTimestamp <= this._usersStore.getPrincipal().notifications_viewed_at ? 'read' : 'new';
+    }
+
+    getNotificationActionText(notification) {
+        const resource = notification.resource;
+
+        switch (notification.operation) {
+            case 'create':
+                return 'created';
+
+            case 'delete':
+                return ['Pod', 'ReplicationController', 'Service'].indexOf(resource.kind) !== -1 ? `deleted ${resource.kind}` : 'deleted';
+
+            case 'add':
+                return resource.kind === 'User' ? `added ${this.getResourceName(resource)} to` : 'added';
+
+            case 'remove':
+                return resource.kind === 'User' ? `removed ${this.getResourceName(resource)} from` : 'removed';
+
+            case 'deploy':
+                return 'deployed';
+
+            default:
+                return notification.operation;
+        }
+    }
+
+    getResourceName(resource) {
+        switch (resource.kind) {
+            case 'User':
+                return this._usersStore.getPrincipal().username === resource.name ? 'you' : this.getUserName(resource.name);
+
+            case 'Pod':
+            case 'ReplicationController':
+            case 'Service':
+                return `${resource.kind} ${resource.name}`;
+
+            default:
+                return resource.name;
+        }
+    }
+
+    getTargetResourceName(notification) {
+        const resource = notification.resource;
+
+        switch (resource.kind) {
+            case 'User':
+                return notification.namespace;
+
+            case 'Pod':
+            case 'ReplicationController':
+            case 'Service':
+                return `${notification.namespace}/${resource.name}`;
+
+            case 'Chart':
+                return notification.namespace ? `${notification.namespace}/${resource.name}` : resource.name;
+
+            default:
+                return resource.name;
+        }
     }
 
     getUserName(user) {
         const userInfo = this._usersStore.get(user);
 
-        return userInfo ? `${userInfo.firstname} ${userInfo.lastname}` : '';
+        return userInfo ? `${userInfo.firstname} ${userInfo.lastname}` : user;
     }
 }
 

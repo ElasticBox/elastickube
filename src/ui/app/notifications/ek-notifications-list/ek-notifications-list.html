@@ -6,14 +6,15 @@
             </div>
             <div ng-repeat="notification in group.notifications track by $index"
                  layout="row" layout-align="start center"
-                 class="ek-notifications-list__group__notification ek-notifications-list__group__notification--{{ notification.state }}">
+                 class="ek-notifications-list__group__notification ek-notifications-list__group__notification--{{ ctrl.getNotificationState(notification) }}">
                 <ek-avatar class="ek-notifications-list__group__notification__avatar"
                            workspace="notification.user"></ek-avatar>
                 <div layout="column" layout-align="center start"
                      class="ek-notifications-list__group__notification__info">
                     <p class="ek-notifications-list__group__notification__info__line">
-                        <span class="ek-notifications-list__group__notification__info__line__user">{{:: ctrl.getUserName(notification.user) }}</span>
-                        {{:: notification.description }}
+                        <span class="ek-notifications-list__group__notification__info__line__user">{{ ctrl.getUserName(notification.user) }}</span>
+                        {{ ctrl.getNotificationActionText(notification) }}
+                        <span class="ek-notifications-list__group__notification__info__line__user">{{ ctrl.getTargetResourceName(notification) }}</span>
                     </p>
                     <div class="ek-notifications-list__group__notification__info__kind"
                          layout="row"
@@ -22,7 +23,7 @@
                                 class="ek-notifications-list__group__notification__info__kind__icon"
                                 md-svg-src="{{:: NotificationIconLookup[notification.kind] }}"></md-icon>
                         <p class="ek-notifications-list__group__notification__info__kind__date">
-                            {{ ctrl.getNotificationDate(notification) }} ago</p>
+                            {{ notification.metadata.creationTimestamp | ekHumanizeDate: 'epoch' }} ago</p>
                     </div>
                 </div>
             </div>

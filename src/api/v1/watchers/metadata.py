@@ -14,7 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from api.v1.watchers import filter_namespaces, filter_metrics
+import pymongo
+
+from api.v1.watchers import criteria_notifications, filter_metrics, filter_namespaces, filter_notifications
 
 
 class WatcherMetadata(object):
@@ -28,6 +30,8 @@ class WatcherMetadata(object):
                 "collection": "Users",
                 "projection": {"password": 0},
                 "criteria": {},
+                "sort": None,
+                "limit": 0,
                 "filter_data": None,
                 "manipulate": False
             },
@@ -35,6 +39,8 @@ class WatcherMetadata(object):
                 "collection": "Namespaces",
                 "projection": None,
                 "criteria": {},
+                "sort": None,
+                "limit": 0,
                 "filter_data": filter_namespaces,
                 "manipulate": False
             },
@@ -42,6 +48,8 @@ class WatcherMetadata(object):
                 "collection": "Settings",
                 "projection": None,
                 "criteria": {},
+                "sort": None,
+                "limit": 0,
                 "filter_data": None,
                 "manipulate": False
             },
@@ -49,6 +57,8 @@ class WatcherMetadata(object):
                 "collection": "Charts",
                 "projection": None,
                 "criteria": {},
+                "sort": None,
+                "limit": 0,
                 "filter_data": None,
                 "manipulate": True
             },
@@ -56,8 +66,19 @@ class WatcherMetadata(object):
                 "collection": "Metrics",
                 "projection": None,
                 "criteria": {},
+                "sort": None,
+                "limit": 0,
                 "filter_data": filter_metrics,
                 "manipulate": False
+            },
+            "notifications": {
+                "collection": "Notifications",
+                "projection": None,
+                "criteria": criteria_notifications,
+                "sort": [("metadata.creationTimestamp", pymongo.DESCENDING)],
+                "limit": 10,
+                "filter_data": filter_notifications,
+                "manipulate": True
             },
             "instances": {
                 "required_params": [],

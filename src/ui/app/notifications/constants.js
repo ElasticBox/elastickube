@@ -31,6 +31,8 @@ const constants = {
         IC_SETTINGS_48PX
     },
     NotificationIconLookup: {
+        User: IC_PUBLIC_48PX,
+
         namespace: IC_PUBLIC_48PX,
         deploy: IC_PLAY_CIRCLE_OUTLINE_48PX,
         delete: IC_REMOVE_CIRCLE_OUTLINE_48PX

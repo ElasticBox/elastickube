@@ -68,5 +68,15 @@ class UsersActions(object):
         if user is not None:
             user["metadata"]["deletionTimestamp"] = datetime.utcnow().isoformat()
             yield Query(self.database, "Users").update(user)
+
+            notification = {
+                "user": self.user["username"],
+                "operation": "delete",
+                "resource": {
+                    "kind": "User",
+                    "name": document["username"]
+                }
+            }
+            yield Query(self.database, "Notifications").insert(notification)
         else:
             raise ObjectNotFoundError("User %s not found." % document["_id"])

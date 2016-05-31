@@ -18,16 +18,24 @@ class NotificationsNamespaceSelectorController {
     constructor($scope, namespacesStore, notificationsStore) {
         'ngInject';
 
-        const onNamespacesChange = () => this.namespaces = _.sortBy(namespacesStore.getAll(), 'metadata.name');
+        const onNamespacesChange = () => {
+            this.namespaces = _.chain(namespacesStore.getAll())
+                .map((namespace) => _.get(namespace, 'metadata.name'))
+                .value().sort();
+
+            this.namespaces.unshift('All');
+            this.notifications = notificationsStore.getAll();
+        };
         const onNotificationsChange = () => {
             this.notifications = notificationsStore.getAll();
-            this.namespaceValues = countNamespaces(this.notifications);
         };
 
         this._namespacesStore = namespacesStore;
 
         namespacesStore.addChangeListener(onNamespacesChange);
         notificationsStore.addChangeListener(onNotificationsChange);
+
+        this._notificationsStore = notificationsStore;
 
         this.namespaces = _.chain(namespacesStore.getAll())
             .map((namespace) => _.get(namespace, 'metadata.name'))
@@ -36,7 +44,6 @@ class NotificationsNamespaceSelectorController {
         this.namespaces.unshift('All');
 
         this.notifications = notificationsStore.getAll();
-        this.namespaceValues = countNamespaces(this.notifications);
 
         this.selectedNamespace = _.first(this.namespaces);
 
@@ -48,6 +55,14 @@ class NotificationsNamespaceSelectorController {
 
     selectNamespace(namespace) {
         this.selectedNamespace = namespace;
+    }
+
+    unreadNamespace(namespace) {
+        const unread = namespace === 'All'
+            ? this._notificationsStore.getTotalUnreadCount()
+            : this._notificationsStore.getUnreadNamespace(namespace);
+
+        return unread > 0 ? unread : '';
     }
 }
 
