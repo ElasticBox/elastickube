@@ -33,6 +33,16 @@ function diagnosticslogs {
   ks logs -f $POD_NAME -c elastickube-diagnostics | sed "s/.*ERROR.*/$RED&$NORMAL/; s/.*INFO.*/$GREEN&$NORMAL/; s/.*WARN.*/$YELLOW&$NORMAL/"
 }
 
+function notificationslogs {
+  local RED=`echo -e '\033[31m'`
+  local GREEN=`echo -e '\033[32m'`
+  local YELLOW=`echo -e '\033[33m'`
+  local NORMAL=`echo -e '\033[0m'`
+
+  POD_NAME="$(ks get pods -l name=elastickube-server -o jsonpath="{.items[*].metadata.name}" | xargs -d ' ')"
+  ks logs -f $POD_NAME -c elastickube-notifications | sed "s/.*ERROR.*/$RED&$NORMAL/; s/.*INFO.*/$GREEN&$NORMAL/; s/.*WARN.*/$YELLOW&$NORMAL/"
+}
+
 function sshapi {
   POD_NAME="$(ks get pods -l name=elastickube-server -o jsonpath="{.items[*].metadata.name}" | xargs -d ' ')"
   ks exec -it $POD_NAME -c elastickube-api /bin/bash
@@ -46,6 +56,11 @@ function sshcharts {
 function sshdiagnostics {
   POD_NAME="$(ks get pods -l name=elastickube-server -o jsonpath="{.items[*].metadata.name}" | xargs -d ' ')"
   ks exec -it $POD_NAME -c elastickube-diagnostics /bin/bash
+}
+
+function sshnotifications {
+  POD_NAME="$(ks get pods -l name=elastickube-server -o jsonpath="{.items[*].metadata.name}" | xargs -d ' ')"
+  ks exec -it $POD_NAME -c elastickube-notifications /bin/bash
 }
 
 alias removeoauth="python /opt/elastickube/build/tools/kubeman.py auth remove-oauth"

@@ -45,6 +45,7 @@ def filter_metrics(data, _user, _message, _settings):
 @coroutine
 def filter_notifications(data, user, message, settings):
     criteria = yield criteria_notifications(user, message, settings)
+    logging.warn('User %s' % user)
     if user.get("notifications_viewed_at", None):
         criteria = {'$and': [
             criteria,

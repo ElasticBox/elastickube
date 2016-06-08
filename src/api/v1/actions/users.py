@@ -20,6 +20,7 @@ from datetime import datetime
 from bson.objectid import ObjectId
 from tornado.gen import coroutine, Return
 
+from api.v1.actions import notifications
 from data.query import Query, ObjectNotFoundError
 
 
@@ -69,14 +70,11 @@ class UsersActions(object):
             user["metadata"]["deletionTimestamp"] = datetime.utcnow().isoformat()
             yield Query(self.database, "Users").update(user)
 
-            notification = {
-                "user": self.user["username"],
-                "operation": "delete",
-                "resource": {
-                    "kind": "User",
-                    "name": document["username"]
-                }
-            }
-            yield Query(self.database, "Notifications").insert(notification)
+            yield notifications.add_notification(
+                self.database,
+                user=self.user["username"],
+                operation="delete",
+                resource=document["username"],
+                kind="User")
         else:
             raise ObjectNotFoundError("User %s not found." % document["_id"])

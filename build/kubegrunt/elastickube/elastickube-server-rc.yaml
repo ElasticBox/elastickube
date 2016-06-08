@@ -73,6 +73,16 @@ spec:
           mountPath: /var/run
         - name: elastickube-code
           mountPath: /opt/elastickube
+      - name: elastickube-notifications
+        image: elasticbox/elastickube-notifications:latest
+        resources:
+          limits:
+            cpu: 50m
+            memory: 64Mi
+        imagePullPolicy: Never
+        volumeMounts:
+        - name: elastickube-code
+          mountPath: /opt/elastickube
       volumes:
       - name: elastickube-code
         hostPath:

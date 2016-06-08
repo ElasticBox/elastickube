@@ -19,6 +19,7 @@ import logging
 import pymongo
 from tornado.gen import coroutine, Return
 
+from api.v1.actions import notifications
 from data.query import Query, ObjectNotFoundError
 
 
@@ -70,16 +71,13 @@ class NamespacesActions(object):
         namespace["members"] = document["members"]
         namespace = yield Query(self.database, "Namespaces").update(namespace)
 
-        notification = {
-            "user": self.user["username"],
-            "operation": "create",
-            "resource": {
-                "kind": "Namespace",
-                "name": namespace["name"]
-            },
-            "namespace": namespace["name"]
-        }
-        yield Query(self.database, "Notifications").insert(notification)
+        yield notifications.add_notification(
+            self.database,
+            user=self.user["username"],
+            operation="create",
+            resource=namespace["name"],
+            kind="Namespace",
+            namespace=namespace["name"])
 
         raise Return(namespace)
 
@@ -138,13 +136,10 @@ class NamespacesActions(object):
     @coroutine
     def _notify_members(self, namespace, members, operation):
         for member in members:
-            notification = {
-                "user": self.user["username"],
-                "operation": operation,
-                "resource": {
-                    "kind": "User",
-                    "name": member
-                },
-                "namespace": namespace["name"]
-            }
-            yield Query(self.database, "Notifications").insert(notification)
+            yield notifications.add_notification(
+                self.database,
+                user=self.user["username"],
+                operation=operation,
+                resource=member,
+                kind="User",
+                namespace=namespace["name"])

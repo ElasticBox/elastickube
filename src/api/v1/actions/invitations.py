@@ -20,7 +20,7 @@ import uuid
 from pymongo.errors import DuplicateKeyError
 from tornado.gen import coroutine, Return
 
-from api.v1.actions import emails
+from api.v1.actions import emails, notifications
 from data.query import Query
 
 
@@ -64,16 +64,12 @@ class InvitationsActions(object):
             "confirm_url": "%s/invite/%s" % (hostname, invite_user["invite_token"])
         }
 
-        notification = {
-            "user": self.user["username"],
-            "operation": "create",
-            "resource": {
-                "kind": "User",
-                "name": email_address
-            },
-            "namespace": namespace
-        }
-        yield Query(self.database, "Notifications").insert(notification)
+        yield notifications.add_notification(
+            self.database,
+            user=self.user["username"],
+            operation="create",
+            resource=email_address,
+            kind="User")
 
         raise Return(invite_info)
 

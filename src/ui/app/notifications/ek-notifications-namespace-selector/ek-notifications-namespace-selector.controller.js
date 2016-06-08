@@ -66,11 +66,11 @@ class NotificationsNamespaceSelectorController {
     }
 }
 
-function countNamespaces(notifications) {
-    return _.chain(notifications)
-        .groupBy('namespace')
-        .mapValues((x) => x.length)
-        .value();
-}
+// function countNamespaces(notifications) {
+//     return _.chain(notifications)
+//         .groupBy('namespace')
+//         .mapValues((x) => x.length)
+//         .value();
+// }
 
 export default NotificationsNamespaceSelectorController;

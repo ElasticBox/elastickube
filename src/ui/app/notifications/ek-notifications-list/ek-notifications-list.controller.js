@@ -49,7 +49,9 @@ class NotificationsListController {
     }
 
     getNotificationState(notification) {
-        return notification.metadata.creationTimestamp <= this._usersStore.getPrincipal().notifications_viewed_at ? 'read' : 'new';
+        const user = this._usersStore.getPrincipal();
+
+        return user && notification.metadata.creationTimestamp <= user.notifications_viewed_at ? 'read' : 'new';
     }
 
     getNotificationActionText(notification) {

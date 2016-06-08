@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+import httplib
 import logging
 
 from bson.json_util import loads
@@ -71,6 +72,8 @@ class MainWebSocketHandler(SecureWebSocketHandler):
             self.build_actions_lookup()
 
         if not self.user:
+            self.write_message({"error": {"message": "Invalid token."}})
+            self.close(httplib.UNAUTHORIZED, "Invalid token.")
             raise Return()
 
         request = yield self.validate_message(message)
