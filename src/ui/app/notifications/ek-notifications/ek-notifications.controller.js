@@ -42,7 +42,9 @@ class NotificationsListController {
     _markAllAsSeen() {
         const lastNotification = this._notificationsStore.getCurrentNewestNotification();
 
-        this._notificationsActionCreator.view(lastNotification.metadata.creationTimestamp);
+        if (!_.isUndefined(lastNotification)) {
+            this._notificationsActionCreator.view(lastNotification.metadata.creationTimestamp);
+        }
     }
 
     loadMore() {

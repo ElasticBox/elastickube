@@ -20,7 +20,7 @@ import logging
 from tornado import autoreload
 from tornado.ioloop import IOLoop
 
-from notifications.email import initialize
+from notifications.daily import initialize
 
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)

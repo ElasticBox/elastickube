@@ -52,7 +52,7 @@ class NotificationsPreviewController {
 
         switch (notification.operation) {
             case 'create':
-                return 'created';
+                return resource.kind === 'User' ? 'invited to' : 'created';
 
             case 'delete':
                 return ['Pod', 'ReplicationController', 'Service'].indexOf(resource.kind) !== -1 ? `deleted ${resource.kind}` : 'deleted';
@@ -74,7 +74,9 @@ class NotificationsPreviewController {
     getResourceName(resource) {
         switch (resource.kind) {
             case 'User':
-                return this._usersStore.getPrincipal().username === resource.name ? 'you' : this.getUserName(resource.name);
+                const user = this._usersStore.getPrincipal();
+
+                return user && user.username === resource.name ? 'you' : this.getUserName(resource.name);
 
             case 'Pod':
             case 'ReplicationController':
@@ -91,7 +93,7 @@ class NotificationsPreviewController {
 
         switch (resource.kind) {
             case 'User':
-                return notification.namespace;
+                return notification.operation === 'create' ? this.getUserName(resource.name) : notification.namespace;
 
             case 'Pod':
             case 'ReplicationController':

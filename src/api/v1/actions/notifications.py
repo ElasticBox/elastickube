@@ -34,7 +34,8 @@ class NotificationsActions(object):
 
     @coroutine
     def check_permissions(self, operation, _document):
-        logging.debug("check_permissions for user %s and operation %s on notifications", self.user["username"], operation)
+        logging.debug(
+            "check_permissions for user %s and operation %s on notifications", self.user["username"], operation)
         raise Return(True)
 
     @coroutine
@@ -106,33 +107,3 @@ def add_notification(database, user, operation, resource, kind, namespace=None):
         notification["namespace"] = namespace
 
     yield Query(database, "Notifications").insert(notification)
-
-
-def generate_notifications_template(origin_user, invite_address, message):
-    # message_escaped = cgi.escape(message)  # Message must be unicode and escaped
-    # name_escaped = cgi.escape(origin_user['name'])
-    # email_escaped = cgi.escape(origin_user['email'], quote=True)
-    # invite_address_escaped = cgi.escape(invite_address)
-
-    return NOTIFICATIONS_TEMPLATE
-    # return NOTIFICATIONS_TEMPLATE.format(invite_address=invite_address_escaped, custom_message=message_escaped,
-    #                               origin_name=name_escaped, origin_email=email_escaped)
-
-
-def send_notifications_sync(smtp_config, origin_user, users, message):
-    try:
-        for user in users:
-            template = generate_notifications_template(origin_user, invite['confirm_url'], message)
-            send(smtp_config, user['email'], NOTIFICATIONS_SUBJECT, template, HTML_BODY_TYPE)
-    except Exception:
-        logging.exception("Exception detected sending notifications")
-        raise
-
-
-@coroutine
-def send_notifications(smtp_config, origin_user, info_users, message, threadpool=None):
-    if threadpool is None:
-        threadpool = DEFAULT_THREADPOOL
-
-    result = yield threadpool.submit(send_notifications_sync, smtp_config, origin_user, info_users, message)
-    raise Return(result)

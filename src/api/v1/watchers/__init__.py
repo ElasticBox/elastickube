@@ -69,7 +69,7 @@ def filter_notifications(data, user, message, settings):
         info["notification"] = data
 
     raise Return(info)
-    
+
 
 @coroutine
 def criteria_notifications(user, message, settings):

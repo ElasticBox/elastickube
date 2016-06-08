@@ -23,10 +23,8 @@ from motor.motor_tornado import MotorClient
 from tornado.gen import coroutine
 from tornado.ioloop import IOLoop
 
-from notifications.email.notifications import EmailNotifications
-# from charts.sync.repo import GitSync
-# from data import watch
-# from data.son.manipulators import KeyManipulator
+from notifications.daily.notifications import EmailNotifications
+from data import watch
 
 
 @coroutine
@@ -41,11 +39,8 @@ def initialize():
     motor_client = MotorClient(mongo_url)
 
     try:
-        # watch.start_monitor(motor_client)
-
-        elastickube_db = motor_client.elastickube
-        # elastickube_db.add_son_manipulator(KeyManipulator())
-        yield EmailNotifications(elastickube_db).sync_loop()
+        watch.start_monitor(motor_client)
+        yield EmailNotifications(motor_client.elastickube).sync_loop()
     except:
         logging.exception("Unexpected error executing EmailNotifications sync loop.")
         IOLoop.current().stop()

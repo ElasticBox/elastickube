@@ -14,15 +14,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+from __future__ import absolute_import
+
 import logging
 import time
 
+from bson.objectid import ObjectId
 from datetime import datetime, date, timedelta
-# from smtplib import SMTP, SMTP_SSL
+from email.MIMEText import MIMEText
+from smtplib import SMTP, SMTP_SSL
 from tornado.gen import coroutine, Return, sleep
 
 from data.query import Query
 from data.watch import add_callback
+from notifications.templates import NotificationTemplate
+
+HTML_BODY_TYPE = 'html'
 
 
 class EmailNotifications(object):
@@ -37,6 +44,7 @@ class EmailNotifications(object):
     def update_smtp(self, document):
         logging.info("Settings updated")
         self.mail_settings = document['o']["mail"] if "mail" in document['o'] else None
+        self.notification_template = NotificationTemplate(self.database, document['o']["hostname"])
 
     @coroutine
     def sync_loop(self):
@@ -46,12 +54,8 @@ class EmailNotifications(object):
 
         settings = yield Query(self.database, "Settings").find_one() or dict()
         if "mail" in settings:
-            logging.warn(settings["mail"])
             self.mail_settings = settings["mail"]
-            # self.server = smtp_config['server']
-            # self.port = int(smtp_config['port'])
-            # self.sender = smtp_config['no_reply_address']
-            # self.secure = smtp_config.get('ssl', True)
+            self.notification_template = NotificationTemplate(self.database, settings["hostname"])
 
         while True:
             try:
@@ -62,19 +66,25 @@ class EmailNotifications(object):
                         notifications = yield self.get_notifications(user)
                         yesterday = datetime.utcnow() - timedelta(days=1)
 
-                        logging.info("User %s has %s pending notifications of %s",
-                            user["username"], len(notifications), yesterday)
+                        logging.info(
+                            "User %s has %s pending notifications for %s",
+                            user["username"],
+                            len(notifications),
+                            yesterday.strftime("%b %d, %Y")
+                        )
 
-                        # TODO: Generate body and Send email
-                        body = self.generate_notifications_template(user, notifications, yesterday)
+                        body, subject = yield self.notification_template.generate_template(
+                            user, notifications, yesterday)
+                        self.send(self.mail_settings, user["username"], subject, body, HTML_BODY_TYPE)
+                        yield self.update_user_notified(user)
 
                 else:
-                    logging.warn("Outbound email is turned off")
+                    logging.info("Outbound email is turned off")
 
             except:
                 logging.exception("Failed sending email notifications.")
 
-            yield sleep(5)
+            yield sleep(600)
 
     @coroutine
     def get_pending_users(self):
@@ -90,6 +100,21 @@ class EmailNotifications(object):
         ]})
 
         raise Return(users)
+
+    @coroutine
+    def update_user_notified(self, user):
+        notified_at = datetime.utcnow()
+        logging.debug("Updating user %s to notified at %s", user["username"], notified_at)
+
+        user = yield Query(self.database, "Users").find_one({"_id": ObjectId(user['_id'])})
+        if not user:
+            raise ObjectNotFoundError("User %s not found." % user["_id"])
+
+        if "notifications" in user:
+            user["notifications"]["notified_at"] = notified_at
+            yield Query(self.database, "Users").update(user)
+
+        raise Return(True)
 
     @coroutine
     def get_notifications(self, user):
@@ -120,54 +145,50 @@ class EmailNotifications(object):
 
         raise Return(criteria)
 
-    def generate_notifications_template(self, user, notifications, notifications_date):
+    def start_connection(self, secure, server, port):
+        connection = None
+        if secure:
+            try:
+                connection = SMTP_SSL(server, port)
+            except Exception:
+                connection = None  # SSL/TLS is not available, fallback to starttls
+                logging.warn('Fall back to STARTTLS connection')
 
-        return "EMAIL CONTENT"
+            if connection is None:
+                connection = SMTP(server, port)
+                connection.set_debuglevel(True)
+                connection.starttls()
 
-    # def start_connection(secure, server, port):
-    #     connection = None
-    #     if secure:
-    #         try:
-    #             connection = SMTP_SSL(server, port)
-    #         except Exception:
-    #             connection = None  # SSL/TLS is not available, fallback to starttls
-    #             logging.info('Fall back to STARTTLS connection')
+        else:
+            connection = SMTP(server, port)
 
-    #         if connection is None:
-    #             connection = SMTP(server, port)
-    #             connection.set_debuglevel(True)
-    #             connection.starttls()
+        return connection
 
-    #     else:
-    #         connection = SMTP(server, port)
+    def send(self, smtp_config, address, subject, body, body_type):
+        server = smtp_config['server']
+        port = int(smtp_config['port'])
+        sender = smtp_config['no_reply_address']
+        logging.debug('Sending mail "%s" from "%s" to "%s" with server "%s"', subject, sender, address, server)
 
-    #     return connection
+        try:
+            connection = self.start_connection(smtp_config.get('ssl', True), server, port)
+            connection.set_debuglevel(False)
+        except Exception:
+            logging.exception('Fail back to start SMTP connection')
+            raise
 
-    # def send(smtp_config, address, subject, body, body_type):
-    #     server = smtp_config['server']
-    #     port = int(smtp_config['port'])
-    #     sender = smtp_config['no_reply_address']
-    #     logging.debug('Sending mail "%s" from "%s" to "%s" with server "%s"', subject, sender, address, server)
+        authentication = smtp_config.get('authentication')
+        if authentication is not None:
+            connection.login(authentication['username'].encode('utf-8'), authentication['password'].encode('utf-8'))
 
-    #     try:
-    #         connection = start_connection(smtp_config.get('ssl', True), server, port)
-    #         connection.set_debuglevel(False)
-    #     except Exception:
-    #         logging.exception('Fail back to start SMTP connection')
-    #         raise
+        sender = smtp_config['no_reply_address']
 
-    #     authentication = smtp_config.get('authentication')
-    #     if authentication is not None:
-    #         connection.login(authentication['username'].encode('utf-8'), authentication['password'].encode('utf-8'))
+        message = MIMEText(body, body_type)
+        message['Subject'] = subject
+        message['From'] = sender
+        try:
+            connection.sendmail(sender, address, message.as_string())
+        finally:
+            connection.close()
 
-    #     sender = smtp_config['no_reply_address']
-
-    #     message = MIMEText(body, body_type)
-    #     message['Subject'] = subject
-    #     message['From'] = sender
-    #     try:
-    #         connection.sendmail(sender, address, message.as_string())
-    #     finally:
-    #         connection.close()
-
-    #     logging.debug("Mail sent")
+        logging.debug("Mail sent")
