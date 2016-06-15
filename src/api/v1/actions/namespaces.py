@@ -19,6 +19,7 @@ import logging
 import pymongo
 from tornado.gen import coroutine, Return
 
+from api.v1.actions import notifications
 from data.query import Query, ObjectNotFoundError
 
 
@@ -69,6 +70,15 @@ class NamespacesActions(object):
 
         namespace["members"] = document["members"]
         namespace = yield Query(self.database, "Namespaces").update(namespace)
+
+        yield notifications.add_notification(
+            self.database,
+            user=self.user["username"],
+            operation="create",
+            resource=namespace["name"],
+            kind="Namespace",
+            namespace=namespace["name"])
+
         raise Return(namespace)
 
     @coroutine
@@ -79,9 +89,15 @@ class NamespacesActions(object):
         if not namespace:
             raise ObjectNotFoundError("Namespace %s not found." % document["_id"])
 
+        members_added = self._diff(document.get("members", []), namespace.get("members", []))
+        members_removed = self._diff(namespace.get("members", []), document.get("members", []))
+
         # TODO: validate members before inserting and do an intersection for race conditions
         namespace["members"] = document["members"]
         updated_namespace = yield Query(self.database, "Namespaces").update(namespace)
+
+        yield self._notify_members(namespace, members_added, "add")
+        yield self._notify_members(namespace, members_removed, "remove")
 
         raise Return(updated_namespace)
 
@@ -112,3 +128,18 @@ class NamespacesActions(object):
                     break
 
         raise Return(document["o"])
+
+    def _diff(self, a, b):
+        b = set(b)
+        return [item for item in a if item not in b]
+
+    @coroutine
+    def _notify_members(self, namespace, members, operation):
+        for member in members:
+            yield notifications.add_notification(
+                self.database,
+                user=self.user["username"],
+                operation=operation,
+                resource=member,
+                kind="User",
+                namespace=namespace["name"])

@@ -51,14 +51,19 @@ def start_connection(secure, server, port):
 def send(smtp_config, address, subject, body, body_type):
     server = smtp_config['server']
     port = int(smtp_config['port'])
-    logging.debug('Sending mail "%s" from "%s" to server "%s"', subject, address, server)
+    sender = smtp_config['no_reply_address']
+    logging.debug('Sending mail "%s" from "%s" to "%s" with server "%s"', subject, sender, address, server)
 
-    connection = start_connection(smtp_config.get('ssl', True), server, port)
-    connection.set_debuglevel(False)
+    try:
+        connection = start_connection(smtp_config.get('ssl', True), server, port)
+        connection.set_debuglevel(False)
+    except Exception:
+        logging.exception('Fail back to start SMTP connection')
+        raise
 
     authentication = smtp_config.get('authentication')
     if authentication is not None:
-        connection.login(authentication['username'], authentication['password'])
+        connection.login(authentication['username'].encode('utf-8'), authentication['password'].encode('utf-8'))
 
     sender = smtp_config['no_reply_address']
 

@@ -18,8 +18,9 @@ import logging
 import uuid
 
 from tornado.gen import coroutine, Return
+from pymongo.errors import DuplicateKeyError
 
-from api.v1.actions import emails
+from api.v1.actions import emails, notifications
 from data.query import Query
 
 
@@ -47,11 +48,29 @@ class InvitationsActions(object):
             "namespaces": namespaces
         }
 
-        yield Query(self.database, "Users").insert(invite_user)
+        # yield Query(self.database, "Users").insert(invite_user)
+        user = yield Query(self.database, "Users").find_one({"email": email_address})
+        if user is None:
+            try:
+                yield Query(self.database, "Users").insert(invite_user)
+            except DuplicateKeyError:
+                logging.exception("User %s already exists sending invitation." % email_address)
+        else:
+            user["invite_token"] = invite_user["invite_token"]
+            user["namespaces"] = invite_user["namespaces"]
+            yield Query(self.database, "Users").update(user)
+
         invite_info = {
             "email": email_address,
             "confirm_url": "%s/invite/%s" % (hostname, invite_user["invite_token"])
         }
+
+        yield notifications.add_notification(
+            self.database,
+            user=self.user["username"],
+            operation="create",
+            resource=email_address,
+            kind="User")
 
         raise Return(invite_info)
 

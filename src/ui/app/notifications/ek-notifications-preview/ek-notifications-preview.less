@@ -1,0 +1,68 @@
+@import "../../colors";
+
+.ek-notifications-preview {
+
+    &__container {
+        max-height: 300px;
+        overflow: auto;
+
+        &__notification {
+            min-height: 52px;
+            padding: 12px 20px;
+
+            &:hover {
+                background-color: rgba(0, 0, 0, 0.1);
+            }
+
+            &--new, &--seen {
+                background-color: @blue50;
+            }
+
+            &__avatar {
+                width: 32px;
+                height: 32px;
+            }
+
+            &__info {
+                width: 100%;
+                padding: 0 15px;
+                p {
+                    margin: 0;
+                }
+
+                &__kind {
+
+                    &__icon {
+                        opacity: 0.8;
+                        width: 13px;
+                        height: 13px;
+                        margin-right: 2px;
+                    }
+                }
+                &__line {
+                    width: 310px;
+                    max-height: 45px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    &__user {
+                        font-weight: bold;
+                        &:after {
+                            content: "";
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    &__see-all {
+        border-top: 1px solid @grey400;
+        height: 52px;
+        p {
+            font-size: 14px;
+            font-weight: bold;
+            color: @cyan500;
+            margin: 0;
+        }
+    }
+}

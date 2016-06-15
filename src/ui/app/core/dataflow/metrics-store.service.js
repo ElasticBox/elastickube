@@ -30,7 +30,7 @@ class MetricsStoreService extends AbstractStore {
         this.dispatchToken = dispatcher.register((action) => {
             switch (action.type) {
                 case this._actions.METRICS_SUBSCRIBED:
-                    this.metrics = _.sortBy(action.metrics, 'timestamp');
+                    this.metrics = action.metrics;
                     this.emit(CHANGE_EVENT);
                     break;
 
@@ -45,11 +45,11 @@ class MetricsStoreService extends AbstractStore {
     }
 
     _addMetric(metric) {
-        this.metrics.push(metric);
+        this.metrics.unshift(metric);
         if (this.metrics.length > MAX_RECORDS) {
-            this.metrics.shift();
+            this.metrics.pop();
         }
-        this.metrics = _.sortBy(this.metrics, 'timestamp');
+        this.metrics = _.sortBy(this.metrics, 'timestamp').reverse();
     }
 
     getMetrics() {

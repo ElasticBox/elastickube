@@ -1,0 +1,84 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://elasticbox.net/schemas/notification",
+  "type": "object",
+  "required": [
+    "_id",
+    "user",
+    "operation",
+    "resource",
+    "namespace",
+    "metadata",
+    "schema"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 36
+    },
+    "user": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "resource": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "Chart",
+            "Namespace",
+            "User",
+            "Pod",
+            "ReplicationController",
+            "Service"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      }
+    },
+    "namespace": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 63
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "creationTimestamp": {
+          "type": "number"
+        },
+        "deletionTimestamp": {
+          "type": "number"
+        },
+        "resourceVersion": {
+          "type": "number"
+        }
+      }
+    },
+    "operation": {
+      "type": "string",
+      "enum": [
+        "create",
+        "delete",
+        "add",
+        "remove",
+        "deploy"
+      ]
+    },
+    "schema": {
+      "type": "string",
+      "enum": [
+        "http://elasticbox.net/schemas/notification"
+      ]
+    }
+  },
+  "type:": "object"
+}

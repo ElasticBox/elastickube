@@ -40,7 +40,7 @@ import LabelEditorDirective from './ek-label-editor/ek-label-editor.directive';
 import LabelDirective from './ek-label/ek-label.directive';
 import LabelsDirective from './ek-labels/ek-labels.directive';
 import NamespaceSelectorDirective from './ek-namespaces-selector/ek-namespace-selector.directive';
-import NotificationsDirective from './ek-notifications/ek-notifications.directive';
+import BannerDirective from './ek-banner/ek-banner.directive';
 import OwnersSelectorDirective from './ek-owners-selector/ek-owners-selector.directive';
 import SearchFilterDirective from './ek-search-filter/ek-search-filter.directive';
 import SelectUsersDirective from './ek-select-users/ek-select-users.directive';
@@ -85,7 +85,7 @@ angular
     .directive('ekInstanceName', () => new InstanceNameDirective())
     .directive('ekInstanceState', () => new InstanceStateDirective())
     .directive('ekNamespaceSelector', () => new NamespaceSelectorDirective())
-    .directive('ekNotifications', () => new NotificationsDirective())
+    .directive('ekBanner', () => new BannerDirective())
     .directive('ekOwnersSelector', () => new OwnersSelectorDirective())
     .directive('ekSearchFilter', () => new SearchFilterDirective())
     .directive('ekSelectUsers', () => new SelectUsersDirective())

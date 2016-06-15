@@ -17,6 +17,7 @@ limitations under the License.
 import AbstractStore from './abstract-store';
 
 const CHANGE_EVENT = 'change';
+const PRINCIPAL_CHANGE_EVENT = 'principalChange';
 
 class UsersStoreService extends AbstractStore {
     constructor($q, session, actions, dispatcher) {
@@ -52,6 +53,16 @@ class UsersStoreService extends AbstractStore {
                     this.emit(CHANGE_EVENT);
                     break;
 
+                case this._actions.USERS_LOGGED:
+                    this._principal = action.principal;
+                    this.emit(PRINCIPAL_CHANGE_EVENT);
+                    break;
+
+                case this._actions.SESSION_DESTROYED:
+                case this._actions.USERS_LOGOUT:
+                    delete this._principal;
+                    this.emit(PRINCIPAL_CHANGE_EVENT);
+                    break;
                 default:
             }
         });
@@ -66,6 +77,10 @@ class UsersStoreService extends AbstractStore {
 
     _setUser(user) {
         this._users[user.username] = this._decodeUserInfo(user);
+        if (_.isEqual(this._principal._id, user._id)) {
+            this._principal = user;
+            this.emit(PRINCIPAL_CHANGE_EVENT);
+        }
     }
 
     _setUsers(users) {
@@ -85,6 +100,7 @@ class UsersStoreService extends AbstractStore {
     destroy() {
         this._users = {};
         delete this._isLoading;
+        delete this._principal;
     }
 
     get(username) {
@@ -105,6 +121,22 @@ class UsersStoreService extends AbstractStore {
 
     removeChangeListener(callback) {
         this.removeListener(CHANGE_EVENT, callback);
+    }
+
+    getPrincipal() {
+        return this._principal;
+    }
+
+    isAdmin() {
+        return _.get(this._principal, 'role') === 'administrator';
+    }
+
+    addPrincipalChangeListener(callback) {
+        this.on(PRINCIPAL_CHANGE_EVENT, callback);
+    }
+
+    removePrincipalChangeListener(callback) {
+        this.removeListener(PRINCIPAL_CHANGE_EVENT, callback);
     }
 }
 

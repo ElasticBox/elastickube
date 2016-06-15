@@ -14,19 +14,27 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import './ek-notifications.less';
+import './ek-header-notifications.less';
+import constants from '../constants';
 import Directive from 'directive';
-import Controller from './ek-notifications.controller';
-import template from './ek-notifications.html';
+import Controller from './ek-header-notifications.controller';
+import template from './ek-header-notifications.html';
 
-class NotificationsDirective extends Directive {
+class HeaderNotificationsDirective extends Directive {
     constructor() {
         super({ Controller, template });
     }
 
     compile(tElement) {
-        tElement.addClass('ek-notifications layout-column layout-align-start-center');
+        tElement.addClass('ek-header-notifications');
+
+        return ($scope, $element, $attrs, $controller) => {
+            _.extend($scope, constants);
+
+            $controller.drop = $element.find('.ek-header-notifications__drop').controller('ekDrop');
+            $controller.settingsPage = $element.find('.ek-header-notifications__drop__content__container__settings');
+        };
     }
 }
 
-export default NotificationsDirective;
+export default HeaderNotificationsDirective;

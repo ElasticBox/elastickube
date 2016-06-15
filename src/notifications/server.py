@@ -1,4 +1,4 @@
-/*
+"""
 Copyright 2016 ElasticBox All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,26 +12,21 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+"""
 
-class NotificationsController {
-    constructor($scope, notifications) {
-        'ngInject';
+import sys
+import logging
 
-        const onChange = () => $scope.$evalAsync(() => this.messages = notifications.getMessages());
+from tornado import autoreload
+from tornado.ioloop import IOLoop
 
-        this._notifications = notifications;
+from notifications.email import initialize
 
-        this.messages = notifications.getMessages();
 
-        notifications.addChangeListener(onChange);
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
-        $scope.$on('$destroy', () => notifications.removeChangeListener(onChange));
-    }
+if __name__ == "__main__":
+    autoreload.start()
 
-    removeMessage(message) {
-        this._notifications.removeMessage(message);
-    }
-}
-
-export default NotificationsController;
+    IOLoop.current().add_callback(initialize)
+    IOLoop.current().start()

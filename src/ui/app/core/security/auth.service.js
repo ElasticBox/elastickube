@@ -18,14 +18,14 @@ import constants from 'constants';
 import profiles from './profiles';
 
 class AuthService {
-    constructor($cookies, initialization, loginNavigationActionCreator, principalStore, routerHelper,
+    constructor($cookies, initialization, loginNavigationActionCreator, usersStore, routerHelper,
                 sessionActionCreator, sessionStore, websocketClient) {
         'ngInject';
         let sessionToken = $cookies.get(constants.SESSION_TOKEN_NAME);
 
         this._$cookies = $cookies;
         this._loginNavigationActionCreator = loginNavigationActionCreator;
-        this._principalStore = principalStore;
+        this._usersStore = usersStore;
         this._routerHelper = routerHelper;
         this._sessionActionCreator = sessionActionCreator;
         this._sessionStore = sessionStore;
@@ -49,11 +49,11 @@ class AuthService {
     }
 
     isLoggedIn() {
-        return !_.isUndefined(this._principalStore.getPrincipal());
+        return !_.isUndefined(this._usersStore.getPrincipal());
     }
 
     isAdmin() {
-        return this._principalStore.isAdmin();
+        return this._usersStore.isAdmin();
     }
 
     logout() {

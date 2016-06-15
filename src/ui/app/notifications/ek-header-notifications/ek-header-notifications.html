@@ -1,0 +1,44 @@
+<ek-drop target-position="bottom right" before-close="ctrl._onDropClose" class-prefix="ek-header-notifications__drop" class="ek-header-notifications__drop">
+    <ek-drop-target>
+        <md-button class="ek-header-notifications__drop__button md-icon-button" aria-label="More" ng-click="ctrl.markAllAsSeen()">
+            <md-icon class="ek-header-notifications__drop__button__icon" md-svg-src="{{:: icons.IC_NOTIFICATIONS_48PX }}"></md-icon>
+        </md-button>
+        <div class="ek-header-notifications__drop__counter" ng-if="ctrl.totalUnread > 0">
+            <div class="ek-header-notifications__drop__counter__number">{{ ctrl.totalUnread }}</div>
+        </div>
+    </ek-drop-target>
+
+    <ek-drop-content class="ek-header-notifications__drop__content" layout="column" layout-align="start center">
+        <div class="ek-header-notifications__drop__content__container">
+            <div class="ek-header-notifications__drop__content__container__notifications">
+                <div class="ek-header-notifications__drop__content__container__notifications__settings" layout="row" layout-align="start center">
+                    <div class="ek-header-notifications__drop__content__container__notifications__settings__icon" layout="row"
+                         layout-align="start center">
+                        <md-icon ng-click="ctrl.showSettings()" class="ek-header-notifications__drop__content__container__notifications__settings__icon__image"
+                                 md-svg-src="{{:: icons.IC_SETTINGS_48PX }}"></md-icon>
+                    </div>
+                    <div class="ek-header-notifications__drop__content__container__notifications__settings__title" layout="row"
+                         layout-align="center center">Notifications</div>
+                </div>
+                <md-divider></md-divider>
+                <ek-notifications-preview></ek-notifications-preview>
+            </div>
+            <div class="ek-header-notifications__drop__content__container__settings">
+                <div class="ek-header-notifications__drop__content__container__notifications__settings" layout="row" layout-align="start center">
+                    <div class="ek-header-notifications__drop__content__container__notifications__settings__icon" layout="row"
+                         layout-align="start center">
+                        <md-icon ng-click="ctrl.showSettings()" class="ek-header-notifications__drop__content__container__notifications__settings__icon__image
+                        ek-header-notifications__drop__content__container__notifications__settings__icon__image--back"
+                                 md-svg-src="{{:: icons.IC_ARROW_BACK_48PX }}"></md-icon>
+                    </div>
+                    <div class="ek-header-notifications__drop__content__container__notifications__settings__title" layout="row"
+                         layout-align="center center">Settings</div>
+                </div>
+                <md-divider></md-divider>
+                <ek-notifications-setup></ek-notifications-setup>
+            </div>
+        </div>
+    </ek-drop-content>
+
+</ek-drop>
+

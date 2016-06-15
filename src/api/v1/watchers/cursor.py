@@ -16,6 +16,7 @@ limitations under the License.
 
 import logging
 
+from inspect import isfunction, isgeneratorfunction
 from tornado.gen import coroutine, Return
 
 from api.v1.watchers.metadata import WatcherMetadata
@@ -42,12 +43,21 @@ class CursorWatcher(object):
     def watch(self):
         logging.info("Starting watch for collection %s", self.metadata["collection"])
 
+        if isfunction(self.metadata["criteria"]):
+            criteria = yield self.metadata["criteria"](self.user, self.message, self.settings)
+        else:
+            criteria = self.metadata["criteria"]
+
         data = yield Query(
             self.settings["database"],
             self.metadata["collection"],
-            manipulate=self.metadata["manipulate"]).find(projection=self.metadata["projection"])
+            manipulate=self.metadata["manipulate"]).find(
+                criteria=criteria,
+                projection=self.metadata["projection"],
+                sort=self.metadata["sort"],
+                limit=self.metadata["limit"])
 
-        data = self.filter_data(data)
+        data = yield self.filter_data(data)
         self.callback(dict(
             action=self.message["action"],
             operation="watched",
@@ -60,7 +70,7 @@ class CursorWatcher(object):
 
     @coroutine
     def data_callback(self, document):
-        logging.info("CursorWatcher for collection %s data_callback", self.metadata["collection"])
+        logging.info("CursorWatcher for collection %s data_callback (%s)", self.metadata["collection"], document["op"])
 
         operation = "updated"
         if document["op"] == "i":
@@ -73,7 +83,7 @@ class CursorWatcher(object):
                 if key in document["o"]:
                     del document["o"][key]
 
-        data = self.filter_data(document["o"])
+        data = yield self.filter_data(document["o"])
         yield self.callback(dict(
             action=self.message["action"],
             operation=operation,
@@ -87,11 +97,12 @@ class CursorWatcher(object):
         logging.info("Stopping watch for collection %s", self.metadata["collection"])
         remove_callback(self.metadata["collection"], self.data_callback)
 
+    @coroutine
     def filter_data(self, data):
         if self.metadata["filter_data"]:
-            return self.metadata["filter_data"](data, self.user, self.message)
-        else:
-            return data
+            data = yield self.metadata["filter_data"](data, self.user, self.message, self.settings)
+
+        raise Return(data)
 
     @coroutine
     def check_permissions(self, operation, _document):

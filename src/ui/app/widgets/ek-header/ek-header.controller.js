@@ -15,12 +15,12 @@ limitations under the License.
 */
 
 class HeaderController {
-    constructor($rootScope, $scope, $injector, $state, auth, routerHelper, sessionStore, principalStore) {
+    constructor($rootScope, $scope, $injector, $state, auth, routerHelper, sessionStore, usersStore) {
         'ngInject';
 
         const watches = [];
         const onChange = () => {
-            this.workspace = this._principalStore.getPrincipal();
+            this.workspace = this._usersStore.getPrincipal();
             this.sections = getSections(auth, routerHelper);
         };
 
@@ -29,12 +29,12 @@ class HeaderController {
         this._$state = $state;
         this._routerHelper = routerHelper;
         this._sessionStore = sessionStore;
-        this._principalStore = principalStore;
+        this._usersStore = usersStore;
 
         this.sections = getSections(auth, routerHelper);
-        this.workspace = this._principalStore.getPrincipal();
+        this.workspace = this._usersStore.getPrincipal();
 
-        this._principalStore.addPrincipalChangeListener(onChange);
+        this._usersStore.addPrincipalChangeListener(onChange);
         this._selectState();
 
         watches.concat([
@@ -42,7 +42,7 @@ class HeaderController {
         ]);
 
         $scope.$on('$destroy', () => {
-            this._principalStore.removePrincipalChangeListener(onChange);
+            this._usersStore.removePrincipalChangeListener(onChange);
             watches.forEach((x) => x());
         });
     }

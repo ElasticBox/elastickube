@@ -97,7 +97,7 @@ function instancesRoutes(routerHelperProvider) {
             url: '/events',
             template: '<ek-instance-events-block></ek-instance-events-block>',
             resolve: {
-                checkInstanceType: ($stateParams, instancesNavigationActionCreator, instancesStore) => {
+                checkInstanceType: ($q, $stateParams, instancesNavigationActionCreator, instancesStore) => {
                     'ngInject';
 
                     return instancesStore.isLoading()
@@ -107,6 +107,8 @@ function instancesRoutes(routerHelperProvider) {
                             if (instance.kind !== 'Pod') {
                                 return instancesNavigationActionCreator.instance($stateParams, { location: 'replace' });
                             }
+
+                            return $q.when();
                         });
                 }
             }
@@ -117,7 +119,7 @@ function instancesRoutes(routerHelperProvider) {
             url: '/containers',
             template: '<ek-instance-containers></ek-instance-containers>',
             resolve: {
-                checkInstanceType: ($stateParams, instancesNavigationActionCreator, instancesStore) => {
+                checkInstanceType: ($q, $stateParams, instancesNavigationActionCreator, instancesStore) => {
                     'ngInject';
 
                     return instancesStore.isLoading()
@@ -127,6 +129,8 @@ function instancesRoutes(routerHelperProvider) {
                             if (instance.kind !== 'Pod') {
                                 return instancesNavigationActionCreator.instance($stateParams, { location: 'replace' });
                             }
+
+                            return $q.when();
                         });
                 }
             }

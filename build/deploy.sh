@@ -179,6 +179,15 @@ ${MASTER_URL_ENV_SECTION}
         volumeMounts:
         - name: elastickube-run
           mountPath: /var/run
+      - name: elastickube-notifications
+        image: elasticbox/elastickube-notifications:${VERSION}
+        resources:
+          limits:
+            cpu: 10m
+            memory: 32Mi
+        volumeMounts:
+        - name: elastickube-run
+          mountPath: /var/run
       volumes:
       - name: elastickube-charts
         hostPath:
