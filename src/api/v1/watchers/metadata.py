@@ -66,8 +66,8 @@ class WatcherMetadata(object):
                 "collection": "Metrics",
                 "projection": None,
                 "criteria": {},
-                "sort": None,
-                "limit": 0,
+                "limit": 500,
+                "sort": [("timestamp", pymongo.DESCENDING)],
                 "filter_data": filter_metrics,
                 "manipulate": False
             },
