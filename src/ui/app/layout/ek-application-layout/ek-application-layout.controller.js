@@ -15,9 +15,10 @@ limitations under the License.
 */
 
 class ApplicationLayoutController {
-    constructor(auth, instancesNavigationActionCreator) {
+    constructor($q, auth, instancesNavigationActionCreator) {
         'ngInject';
 
+        this._$q = $q;
         this._auth = auth;
         this._instancesNavigationActionCreator = instancesNavigationActionCreator;
     }
@@ -30,6 +31,8 @@ class ApplicationLayoutController {
         if (this._auth.isLoggedIn()) {
             return this._instancesNavigationActionCreator.instances();
         }
+
+        return this._$q.when();
     }
 }
 

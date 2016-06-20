@@ -20,7 +20,7 @@ import InstancesAPIService from './instances-api.service';
 import LogsAPIService from './logs-api.service';
 import MetricsAPIService from './metrics-api.service';
 import NamespacesAPIService from './namespaces-api.service';
-import PrincipalAPIService from './principal-api.service';
+import NotificationsAPIService from './notifications-api.service';
 import SettingsAPIService from './settings-api.service';
 import UsersAPIService from './users-api.service';
 import InvitesAPIService from './invites-api.service';
@@ -37,7 +37,7 @@ angular
     .service('logsAPI', LogsAPIService)
     .service('metricsAPI', MetricsAPIService)
     .service('namespacesAPI', NamespacesAPIService)
-    .service('principalAPI', PrincipalAPIService)
+    .service('notificationsAPI', NotificationsAPIService)
     .service('settingsAPI', SettingsAPIService)
     .service('usersAPI', UsersAPIService)
     .service('invitesAPI', InvitesAPIService)

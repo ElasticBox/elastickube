@@ -17,14 +17,14 @@ limitations under the License.
 import constants from 'constants';
 
 class SignupController {
-    constructor($log, $scope, $stateParams, initialization, instancesNavigationActionCreator, principalActionCreator) {
+    constructor($log, $scope, $stateParams, initialization, instancesNavigationActionCreator, usersActionCreator) {
         'ngInject';
 
         this._$log = $log.getInstance(this.constructor.name);
         this._$scope = $scope;
         this._initialization = initialization;
         this._instancesNavigationActionCreator = instancesNavigationActionCreator;
-        this._principalActionCreator = principalActionCreator;
+        this._usersActionCreator = usersActionCreator;
         this._code = $stateParams.code;
 
         $scope.user = {
@@ -33,7 +33,7 @@ class SignupController {
     }
 
     submit() {
-        return this._principalActionCreator.signup(this._$scope.user, this._code)
+        return this._usersActionCreator.signup(this._$scope.user, this._code)
             .then(() => this._initialization.initializeLoggedInUser())
             .then(() => this._instancesNavigationActionCreator.instances())
             .catch((response) => {

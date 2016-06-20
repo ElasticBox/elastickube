@@ -62,7 +62,9 @@ class NamespacesStoreService extends AbstractStore {
     }
 
     _setNamespace(namespace) {
-        this._namespaces[namespace.metadata.uid] = namespace;
+        if (namespace) {
+            this._namespaces[namespace.metadata.uid] = namespace;
+        }
     }
 
     _setNamespaces(namespaces) {

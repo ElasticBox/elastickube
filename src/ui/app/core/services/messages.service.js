@@ -24,7 +24,7 @@ const types = {
 const MESSAGE_LIFETIME = 5000;
 const CHANGE_EVENT = 'change';
 
-class NotificationsService extends EventEmitter {
+class MessagesService extends EventEmitter {
     constructor() {
         super();
 
@@ -88,4 +88,4 @@ class NotificationsService extends EventEmitter {
     }
 }
 
-export { NotificationsService, types as notificationTypes };
+export { MessagesService, types as messageTypes };

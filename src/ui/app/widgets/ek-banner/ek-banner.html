@@ -1,14 +1,14 @@
-<div class="ek-notification animate"
+<div class="ek-message animate"
      layout="row" layout-align="start center"
      ng-repeat="message in ctrl.messages track by message.id"
      ng-class="{
-        'ek-notification--info': message.type === 'INFO',
-        'ek-notification--warn': message.type === 'WARN',
-        'ek-notification--error': message.type === 'ERROR',
+        'ek-message--info': message.type === 'INFO',
+        'ek-message--warn': message.type === 'WARN',
+        'ek-message--error': message.type === 'ERROR',
      }">
     <span>{{:: message.text }}</span>
 
-    <span class="ek-notification__dismiss"
+    <span class="ek-message__dismiss"
           ng-if="message.type === 'ERROR'"
           ng-click="ctrl.removeMessage(message)">dismiss</span>
 </div>

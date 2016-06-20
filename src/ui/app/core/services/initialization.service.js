@@ -19,8 +19,8 @@ import constants from 'constants';
 class InitializationService {
 
     /* eslint max-params: 0 */
-    constructor($q, $cookies, chartsActionCreator, instancesAPI, namespacesActionCreator, namespacesStore, principalActionCreator,
-                sessionActionCreator, sessionStore, usersActionCreator, websocketClient) {
+    constructor($q, $cookies, chartsActionCreator, instancesAPI, namespacesActionCreator, namespacesStore,
+                notificationsActionCreator, sessionActionCreator, sessionStore, usersActionCreator, websocketClient) {
         'ngInject';
 
         this._$q = $q;
@@ -29,7 +29,7 @@ class InitializationService {
         this._instancesAPI = instancesAPI;
         this._namespacesActionCreator = namespacesActionCreator;
         this._namespacesStore = namespacesStore;
-        this._principalActionCreator = principalActionCreator;
+        this._notificationsActionCreator = notificationsActionCreator;
         this._sessionActionCreator = sessionActionCreator;
         this._sessionStore = sessionStore;
         this._usersActionCreator = usersActionCreator;
@@ -62,8 +62,9 @@ class InitializationService {
             .then(() => this._instancesAPI.initializeSubscriptions())
             .then(() => this._chartsActionCreator.subscribe())
             .then(() => this._namespacesActionCreator.subscribe())
+            .then(() => this._notificationsActionCreator.subscribe())
             .then(() => this._usersActionCreator.subscribe())
-            .then(() => this._principalActionCreator.loggedIn(tokenData.username))
+            .then(() => this._usersActionCreator.loggedIn(tokenData.username))
             .then(() => {
                 let namespace = this._sessionStore.getActiveNamespace();
 

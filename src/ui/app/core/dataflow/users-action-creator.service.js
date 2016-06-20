@@ -15,13 +15,14 @@ limitations under the License.
 */
 
 class UsersActionCreatorService {
-    constructor(actions, dispatcher, usersAPI, invitesAPI) {
+    constructor(actions, dispatcher, usersAPI, invitesAPI, usersStore) {
         'ngInject';
 
         this._actions = actions;
         this._dispatcher = dispatcher;
         this._usersAPI = usersAPI;
         this._invitesAPI = invitesAPI;
+        this._usersStore = usersStore;
 
         usersAPI.addOnCreatedListener((user) => this._dispatcher.dispatch({ type: this._actions.USERS_CREATED, user }));
         usersAPI.addOnUpdatedListener((user) => this._dispatcher.dispatch({ type: this._actions.USERS_UPDATED, user }));
@@ -47,6 +48,29 @@ class UsersActionCreatorService {
 
         return this._invitesAPI.create(invitations)
             .then(() => this._dispatcher.dispatch({ type: this._actions.USERS_INVITED }));
+    }
+
+    signup(user, code) {
+        this._dispatcher.dispatch({ type: this._actions.USERS_SIGN_UP });
+
+        return this._usersAPI.signup(user, code);
+    }
+
+    login(user) {
+        this._dispatcher.dispatch({ type: this._actions.USERS_LOGIN });
+
+        return this._usersAPI.login(user);
+    }
+
+    loggedIn(username) {
+        this._dispatcher.dispatch({
+            type: this._actions.USERS_LOGGED,
+            principal: this._usersStore.get(username)
+        });
+    }
+
+    logout() {
+        return this._$q.when(this._dispatcher.dispatch({ type: this._actions.USERS_LOGOUT }));
     }
 }
 

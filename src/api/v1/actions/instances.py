@@ -19,6 +19,7 @@ import logging
 from bson.objectid import ObjectId
 from tornado.gen import coroutine, Return
 
+from api.v1.actions import notifications
 from data.query import Query, ObjectNotFoundError
 
 
@@ -62,6 +63,14 @@ class InstancesActions(object):
                 resource, namespace=namespace)
             result.append(response)
 
+        yield notifications.add_notification(
+            self.database,
+            user=self.user["username"],
+            operation="deploy",
+            resource=chart["name"],
+            kind="Chart",
+            namespace=namespace)
+
         raise Return(result)
 
     @coroutine
@@ -80,5 +89,13 @@ class InstancesActions(object):
 
         response = yield self.kube[self.kube.get_resource_type(document["kind"])].delete(
             document["name"], namespace=document["namespace"])
+
+        yield notifications.add_notification(
+            self.database,
+            user=self.user["username"],
+            operation="delete",
+            resource=document["name"],
+            kind=document["kind"],
+            namespace=document["namespace"])
 
         raise Return(response)

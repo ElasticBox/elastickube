@@ -16,7 +16,7 @@ limitations under the License.
 
 class NamespacesSelectorController {
 
-    constructor($scope, $state, instancesNavigationActionCreator, chartsNavigationActionCreator, sessionStore, namespacesStore,
+    constructor($q, $scope, $state, instancesNavigationActionCreator, chartsNavigationActionCreator, sessionStore, namespacesStore,
                 sessionActionCreator) {
         'ngInject';
 
@@ -26,6 +26,7 @@ class NamespacesSelectorController {
         };
         const onNamespaceChange = () => this.namespace = this._sessionStoreService.getActiveNamespace();
 
+        this._$q = $q;
         this._$state = $state;
         this._instancesNavigationActionCreator = instancesNavigationActionCreator;
         this._chartsNavigationActionCreator = chartsNavigationActionCreator;
@@ -58,6 +59,7 @@ class NamespacesSelectorController {
                         return this._chartsNavigationActionCreator.charts();
 
                     default:
+                        return this._$q.when();
                 }
             });
     }

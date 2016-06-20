@@ -55,12 +55,14 @@ class Query(object):
         raise Return(document)
 
     @coroutine
-    def find(self, criteria=None, projection=None):
+    def find(self, criteria=None, projection=None, sort=None, limit=0):
         documents = []
 
         cursor = self.database[self.collection].find(
             self._generate_query(criteria),
             projection,
+            sort=sort,
+            limit=limit,
             manipulate=self.manipulate)
         while (yield cursor.fetch_next):
             documents.append(cursor.next_object())
@@ -116,3 +118,13 @@ class Query(object):
     def remove(self, document):
         response = yield self.database[self.collection].remove({"_id": document["_id"]})
         raise Return(response)
+
+    @coroutine
+    def aggregate(self, pipeline):
+        aggregations = []
+
+        cursor = self.database[self.collection].aggregate(pipeline)
+        while (yield cursor.fetch_next):
+            aggregations.append(cursor.next_object())
+
+        raise Return(aggregations)
