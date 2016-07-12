@@ -31,6 +31,7 @@ class InvitationsActions(object):
 
         self.database = settings['database']
         self.user = user
+        self.notifications = []
 
     @coroutine
     def check_permissions(self, operation, _document):

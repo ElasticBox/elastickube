@@ -28,22 +28,24 @@ class UsersActions(object):
     def __init__(self, settings, user):
         logging.info("Initializing UsersActions")
 
-        self.database = settings['database']
+        self.database = settings["database"]
         self.user = user
+        self.notifications = []
 
     @coroutine
-    def check_permissions(self, operation, document):
+    def check_permissions(self, operation, request_body):
         logging.debug("check_permissions for user %s and operation %s on users", self.user["username"], operation)
         if operation in ["create", "delete"] and self.user["role"] != "administrator":
             raise Return(False)
 
-        if operation == "update" and str(self.user["_id"]) != document["_id"] and self.user["role"] != "administrator":
+        if (operation == "update" and str(self.user["_id"]) != request_body["_id"] and
+                self.user["role"] != "administrator"):
             raise Return(False)
 
         if (operation == "update" and
-                self.user["_id"] == document["_id"] and
+                self.user["_id"] == request_body["_id"] and
                 self.user["role"] == "user" and
-                self.user["role"] != document["role"]):
+                self.user["role"] != request_body["role"]):
             raise Return(False)
 
         raise Return(True)
@@ -52,12 +54,14 @@ class UsersActions(object):
     def update(self, document):
         logging.debug("Updating user %s", document["_id"])
 
-        user = yield Query(self.database, "Users").find_one({"_id": ObjectId(document['_id'])})
-        if not user:
+        initial_user = yield Query(self.database, "Users").find_one({"_id": ObjectId(document["_id"])})
+        if not initial_user:
             raise ObjectNotFoundError("User %s not found." % document["_id"])
 
-        updated_user = yield Query(self.database, "Users").update(document)
-        raise Return(updated_user)
+        user = dict(initial_user).update(document)
+        updated_user = yield Query(self.database, "Users").update(user)
+
+        raise Return((initial_user, updated_user))
 
     @coroutine
     def delete(self, document):

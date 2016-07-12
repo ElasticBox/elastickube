@@ -18,20 +18,20 @@ import constants from 'constants';
 import defaultPasswordRegexString from 'text!../../../../api/resources/password_default_regex';
 
 class SignupController {
-    constructor($log, $scope, adminNavigationActionCreator, initialization, principalActionCreator) {
+    constructor($log, $scope, adminNavigationActionCreator, initialization, usersActionCreator) {
         'ngInject';
 
         this._$log = $log.getInstance(this.constructor.name);
         this._$scope = $scope;
         this._adminNavigationActionCreator = adminNavigationActionCreator;
         this._initialization = initialization;
-        this._principalActionCreator = principalActionCreator;
+        this._usersActionCreator = usersActionCreator;
 
         this.PASSWORD_REGEX = new RegExp(defaultPasswordRegexString.trim());
     }
 
     submit() {
-        return this._principalActionCreator.signup(this._$scope.user)
+        return this._usersActionCreator.signup(this._$scope.user)
             .then(() => this._initialization.initializeLoggedInUser())
             .then(() => this._adminNavigationActionCreator.settings())
             .catch((response) => {

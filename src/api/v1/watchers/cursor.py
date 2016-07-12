@@ -15,6 +15,7 @@ limitations under the License.
 """
 
 import logging
+from inspect import isfunction
 
 from tornado.gen import coroutine, Return
 
@@ -42,10 +43,16 @@ class CursorWatcher(object):
     def watch(self):
         logging.info("Starting watch for collection %s", self.metadata["collection"])
 
+        if isfunction(self.metadata["criteria"]):
+            criteria = self.metadata["criteria"](self.user, self.message, self.settings)
+        else:
+            criteria = self.metadata["criteria"]
+
         data = yield Query(
             self.settings["database"],
             self.metadata["collection"],
             manipulate=self.metadata["manipulate"]).find(
+                criteria=criteria,
                 projection=self.metadata["projection"],
                 sort=self.metadata["sort"],
                 limit=self.metadata["limit"])
@@ -68,7 +75,7 @@ class CursorWatcher(object):
 
     @coroutine
     def data_callback(self, document):
-        logging.info("CursorWatcher for collection %s data_callback", self.metadata["collection"])
+        logging.info("CursorWatcher for collection %s data_callback (%s)", self.metadata["collection"], document["op"])
 
         operation = "updated"
         if document["op"] == "i":
@@ -97,9 +104,9 @@ class CursorWatcher(object):
 
     def filter_data(self, data):
         if self.metadata["filter_data"]:
-            return self.metadata["filter_data"](data, self.user, self.message)
-        else:
-            return data
+            data = self.metadata["filter_data"](data, self.user, self.message, self.settings)
+
+        return data
 
     @coroutine
     def check_permissions(self, operation, _document):

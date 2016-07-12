@@ -56,6 +56,11 @@ class SyncNamespaces(object):
         yield Query(self.settings["database"], "Namespaces").update_fields({"_id": namespace["_id"]}, update)
 
     @coroutine
+    def _add_admin_users(self, namespace):
+        admin_users = yield Query(self.settings["database"], "Users").find({"role": "administrator"})
+        namespace["members"] = [admin_user["username"] for admin_user in admin_users]
+
+    @coroutine
     def start_sync(self):
         @coroutine
         def data_callback(data):
@@ -65,6 +70,7 @@ class SyncNamespaces(object):
 
             converted_namespace = self._convert_namespace(data["object"])
             if data["type"] == "ADDED":
+                yield self._add_admin_users(converted_namespace)
                 yield Query(self.settings["database"], "Namespaces").insert(converted_namespace)
 
             elif data["type"] == "DELETED":
@@ -101,6 +107,7 @@ class SyncNamespaces(object):
             if namespace["_id"] in namespace_ids:
                 yield self._update_namespace(namespace)
             else:
+                yield self._add_admin_users(namespace)
                 yield Query(self.settings["database"], "Namespaces").insert(namespace)
 
         self.resource_version = result["metadata"]["resourceVersion"]

@@ -45,7 +45,7 @@ def get_parser():
         default='',
         help='Output result in file')
 
-    parser.add_argument("files", nargs="*")
+    parser.add_argument('files', nargs='*')
     return parser
 
 
@@ -76,10 +76,9 @@ def run_tests(test_files, verbose=False, debug=False, output=None):
         suite.addTest(tests)
 
     # Set output verbosity
+    verbosity = 1
     if verbose:
         verbosity = 2
-    else:
-        verbosity = 1
 
     # Set logging level
     if debug:

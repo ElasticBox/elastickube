@@ -27,9 +27,10 @@ class LogsActions(object):
         self.kube = settings["kube"]
         self.database = settings["database"]
         self.user = user
+        self.notifications = []
 
     @coroutine
-    def check_permissions(self, operation, _document):
+    def check_permissions(self, operation, _request_body):
         logging.debug("check_permissions for user %s and operation %s on instances", self.user["username"], operation)
         raise Return(True)
 

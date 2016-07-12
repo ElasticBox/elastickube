@@ -16,7 +16,7 @@ limitations under the License.
 
 import pymongo
 
-from api.v1.watchers import filter_namespaces, filter_metrics
+from api.v1.watchers import criteria_notifications, filter_namespaces
 
 
 class WatcherMetadata(object):
@@ -68,8 +68,17 @@ class WatcherMetadata(object):
                 "criteria": {},
                 "limit": 500,
                 "sort": [("timestamp", pymongo.DESCENDING)],
-                "filter_data": filter_metrics,
+                "filter_data": None,
                 "manipulate": False
+            },
+            "notifications": {
+                "collection": "Notifications",
+                "projection": None,
+                "criteria": criteria_notifications,
+                "sort": [("metadata.creationTimestamp", pymongo.DESCENDING)],
+                "limit": 10,
+                "filter_data": None,
+                "manipulate": True
             },
             "instances": {
                 "required_params": [],

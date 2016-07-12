@@ -46,19 +46,19 @@
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "metadata": {
-              "type": "string"
-            },
-            "idp_entity_id": {
+            "idp_cert": {
               "type": "string"
             },
             "idp_domain": {
               "type": "string"
             },
-            "idp_cert": {
+            "idp_entity_id": {
               "type": "string"
             },
             "idp_sso": {
+              "type": "string"
+            },
+            "metadata": {
               "type": "string"
             }
           }

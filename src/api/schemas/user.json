@@ -68,6 +68,17 @@
         }
       }
     },
+    "notifications": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "type": "boolean"
+        },
+        "notified_at": {
+          "type": "number"
+        }
+      }
+    },
     "password": {
       "type": "object",
       "properties": {

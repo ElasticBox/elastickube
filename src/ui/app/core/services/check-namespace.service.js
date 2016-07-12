@@ -15,8 +15,10 @@ limitations under the License.
 */
 
 class CheckNamespaceService {
-    constructor($stateParams, instancesNavigationActionCreator, namespacesStore, sessionActionCreator, sessionStore) {
+    constructor($q, $stateParams, instancesNavigationActionCreator, namespacesStore, sessionActionCreator, sessionStore) {
         'ngInject';
+
+        this._$q = $q;
 
         this._$stateParams = $stateParams;
         this._instancesNavigationActionCreator = instancesNavigationActionCreator;
@@ -37,6 +39,8 @@ class CheckNamespaceService {
                 return this._sessionActionCreator.selectNamespace(namespace);
             }
         }
+
+        return this._$q.when();
     }
 }
 

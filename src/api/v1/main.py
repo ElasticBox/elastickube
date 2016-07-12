@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+import httplib
 import logging
 
 from bson.json_util import loads
@@ -25,6 +26,7 @@ from api.v1 import SecureWebSocketHandler
 from api.v1.actions.logs import LogsActions
 from api.v1.actions.instances import InstancesActions
 from api.v1.actions.namespaces import NamespacesActions
+from api.v1.actions.notifications import NotificationsActions
 from api.v1.actions.settings import SettingsActions
 from api.v1.actions.users import UsersActions
 from api.v1.actions.invitations import InvitationsActions
@@ -44,7 +46,8 @@ SUPPORTED_ACTIONS = [
     "invitations",
     "charts",
     "logs",
-    "metrics"
+    "metrics",
+    "notifications"
 ]
 
 
@@ -69,6 +72,8 @@ class MainWebSocketHandler(SecureWebSocketHandler):
             self.build_actions_lookup()
 
         if not self.user:
+            self.write_message({"error": {"message": "Invalid token."}})
+            self.close(httplib.UNAUTHORIZED, "Invalid token.")
             raise Return()
 
         request = yield self.validate_message(message)
@@ -93,6 +98,7 @@ class MainWebSocketHandler(SecureWebSocketHandler):
                     response.update(dict(status_code=405, body=dict(message=error)))
 
                 else:
+                    initial_document = None
                     if not (yield action.check_permissions(request["operation"], body)):
                         error = "Operation %s forbidden for action %s." % (request["operation"], request["action"])
                         response.update(dict(status_code=403, body=dict(message=error)))
@@ -108,7 +114,8 @@ class MainWebSocketHandler(SecureWebSocketHandler):
                                 response["operation"] = "created"
 
                             elif request["operation"] == "update":
-                                response["body"] = yield action.update(body)
+                                initial_document, updated_document = yield action.update(body)
+                                response["body"] = updated_document
                                 response["operation"] = "updated"
 
                             elif request["operation"] == "delete":
@@ -127,6 +134,10 @@ class MainWebSocketHandler(SecureWebSocketHandler):
                             response.update(dict(
                                 status_code=kube_error.status_code, body=dict(message=kube_error.message)
                             ))
+
+                    if request['operation'] in action.notifications:
+                        yield action.create_notifications(
+                            request["operation"], body, response["body"], initial_document=initial_document)
 
             else:
                 error = "Action %s does not support operations." % request["action"]
@@ -257,6 +268,10 @@ class MainWebSocketHandler(SecureWebSocketHandler):
             ),
             invitations=dict(
                 rest=InvitationsActions(self.settings, self.user),
+            ),
+            notifications=dict(
+                rest=NotificationsActions(self.settings, self.user),
+                watcher_cls=CursorWatcher
             ),
         )
 
