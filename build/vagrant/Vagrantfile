@@ -13,7 +13,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     :disabled       => false,
     :type           => "rsync",
     :rsync__auto    => true,
-    :rsync__exclude => ["src/build/ui", "node_modules", "*.pyc"]
+    :rsync__exclude => ["src/build/ui", "node_cache", "node_modules", "*.pyc"]
 
   config.vm.network :private_network, ip: "10.107.56.115"
   config.vm.network "public_network", bridge: 'en0: Wi-Fi (AirPort)'
