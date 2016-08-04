@@ -14,6 +14,7 @@ We designed ElasticKube with the following principles in mind:
 * **stateless**: lifecycle and state is always stored in kubernetes
 * **integrated**: git, jenkins, sso authentication
 
+
 ### Getting started
 
 ElastiKube runs as a containerized application inside your Kubernetes cluster. To deploy ElasticKube the only requirement is access to a terminal with `kubectl` configured.
