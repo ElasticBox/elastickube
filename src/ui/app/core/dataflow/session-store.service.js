@@ -73,7 +73,10 @@ class SessionStoreService extends AbstractStore {
     }
 
     setInitialState(name, params) {
-        this._session.setItem(constants.INITIAL_STATE, JSON.stringify({'name': name, 'params': params}));
+        this._session.setItem(constants.INITIAL_STATE, JSON.stringify({
+            name,
+            params
+        }));
     }
 
     getInitialState() {
