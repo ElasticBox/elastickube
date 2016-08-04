@@ -15,13 +15,13 @@ limitations under the License.
 */
 
 class RequestInviteController {
-    constructor($log, $stateParams, loginNavigationActionCreator, principalActionCreator) {
+    constructor($log, $stateParams, loginNavigationActionCreator, notificationsActionCreator) {
         'ngInject';
 
         this._$log = $log.getInstance(this.constructor.name);
         this._$stateParams = $stateParams;
         this._loginNavigationActionCreator = loginNavigationActionCreator;
-        this._principalActionCreator = principalActionCreator;
+        this._notificationsActionCreator = notificationsActionCreator;
         this.submitting = false;
 
         if (this._$stateParams.account) {
@@ -33,7 +33,11 @@ class RequestInviteController {
     submit() {
         this.submitting = true;
 
-        return this._principalActionCreator.requestInvite({ email: this.account || this.email, name: this.name })
+        return this._notificationsActionCreator
+            .requestInvite({
+                email: this.account || this.email,
+                name: this.name
+            })
             .then(() => this._loginNavigationActionCreator.login())
             .catch((error) => this._$log.warn(error.statusText))
             .finally(() => this.submitting = false);

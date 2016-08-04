@@ -15,8 +15,8 @@ limitations under the License.
 */
 
 class LoginController {
-    constructor($location, $log, $scope, initialization, instancesNavigationActionCreator,
-    loginNavigationActionCreator, principalActionCreator, routerHelper, sessionStore) {
+    constructor($location, $log, $scope, initialization, instancesNavigationActionCreator, loginNavigationActionCreator, usersActionCreator,
+        routerHelper, sessionStore) {
         'ngInject';
 
         this._$location = $location;
@@ -25,13 +25,14 @@ class LoginController {
         this._initialization = initialization;
         this._instancesNavigationActionCreator = instancesNavigationActionCreator;
         this._loginNavigationActionCreator = loginNavigationActionCreator;
-        this._principalActionCreator = principalActionCreator;
+        this._usersActionCreator = usersActionCreator;
         this._routerHelper = routerHelper;
         this._sessionStore = sessionStore;
     }
 
     submit() {
-        return this._usersActionCreator.login(this.user)
+        return this._usersActionCreator
+            .login(this.user)
             .then(() => this._initialization.initializeLoggedInUser())
             .then(() => {
                 const _initialState = this._sessionStore.getInitialState();

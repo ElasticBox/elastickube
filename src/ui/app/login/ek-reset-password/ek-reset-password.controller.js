@@ -15,16 +15,19 @@ limitations under the License.
 */
 
 class ResetPasswordController {
-    constructor($log, loginNavigationActionCreator, principalActionCreator) {
+    constructor($log, loginNavigationActionCreator, notificationsActionCreator) {
         'ngInject';
 
         this._$log = $log.getInstance(this.constructor.name);
         this._loginNavigationActionCreator = loginNavigationActionCreator;
-        this._principalActionCreator = principalActionCreator;
+        this._notificationsActionCreator = notificationsActionCreator;
     }
 
     submit() {
-        return this._principalActionCreator.resetPassword({ email: this.email })
+        return this._notificationsActionCreator
+            .resetPassword({
+                email: this.email
+            })
             .then(() => this._loginNavigationActionCreator.confirmResetPassword())
             .catch((error) => this._$log.warn(error.statusText));
     }

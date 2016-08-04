@@ -15,24 +15,27 @@ limitations under the License.
 */
 
 class ChangePasswordController {
-    constructor($log, $location, loginNavigationActionCreator, principalActionCreator) {
+    constructor($log, $location, loginNavigationActionCreator, notificationsActionCreator) {
         'ngInject';
 
         this._$log = $log;
         this._$location = $location;
 
         this._loginNavigationActionCreator = loginNavigationActionCreator;
-        this._principalActionCreator = principalActionCreator;
+        this._notificationsActionCreator = notificationsActionCreator;
 
         this.PASSWORD_REGEX = new RegExp(this.authProviders.password.regex);
     }
 
     submit() {
-        return this._principalActionCreator.changePassword({ password: this.password, token: Object.keys(this._$location.search())[0] })
+        return this._notificationsActionCreator
+            .changePassword({
+                password: this.password,
+                token: Object.keys(this._$location.search())[0]
+            })
             .then(() => this._loginNavigationActionCreator.login())
             .catch((error) => this._$log.warn(error.statusText));
     }
 }
 
 export default ChangePasswordController;
-
