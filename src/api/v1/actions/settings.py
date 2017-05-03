@@ -16,11 +16,12 @@ limitations under the License.
 
 import logging
 
+from bson.objectid import ObjectId
 from tornado.gen import coroutine, Return
 
 from api.kube.exceptions import KubernetesException
 from api.v1.auth import Saml2LoginHandler
-from data.query import Query
+from data.query import Query, ObjectNotFoundError
 
 
 class SettingsActions(object):
@@ -28,32 +29,37 @@ class SettingsActions(object):
     def __init__(self, settings, user):
         logging.info("Initializing SettingsActions")
 
-        self.database = settings['database']
+        self.database = settings["database"]
         self.user = user
+        self.notifications = []
 
     @coroutine
-    def check_permissions(self, operation, _document):
+    def check_permissions(self, operation, _request_body):
         logging.debug("check_permissions for user %s and operation %s on settings", self.user["username"], operation)
-        raise Return(self.user['role'] == 'administrator')
+        raise Return(self.user["role"] == "administrator")
 
     @coroutine
     def update(self, document):
         logging.info("Updating Setting document with _id: %s", document["_id"])
 
-        saml_config = document[u'authentication'].get('saml', None)
+        initial_settings = yield Query(self.database, "Settings").find_one({"_id": ObjectId(document["_id"])})
+        if not initial_settings:
+            raise ObjectNotFoundError("User %s not found." % document["_id"])
+
+        saml_config = document[u'authentication'].get("saml", None)
         if saml_config is not None:
             try:
                 idp_entity_id, idp_domain, idp_cert, idp_sso = Saml2LoginHandler.get_metadata_info(
-                    saml_config.get('metadata', None))
-            except Exception as error:
+                    saml_config.get("metadata", None))
+            except Exception:
                 logging.exception("Error parsing metadata")
                 raise KubernetesException(
-                    "Invalid SAML IdP metadata file {0}".format(saml_config.get('metadata_file', "")), 400)
+                    "Invalid SAML IdP metadata file {0}".format(saml_config.get("metadata_file", "")), 400)
 
-            saml_config['idp_entity_id'] = idp_entity_id
-            saml_config['idp_domain'] = idp_domain
-            saml_config['idp_cert'] = idp_cert
-            saml_config['idp_sso'] = idp_sso
+            saml_config["idp_entity_id"] = idp_entity_id
+            saml_config["idp_domain"] = idp_domain
+            saml_config["idp_cert"] = idp_cert
+            saml_config["idp_sso"] = idp_sso
 
-        setting = yield Query(self.database, "Settings").update(document)
-        raise Return(setting)
+        updated_settings = yield Query(self.database, "Settings").update(document)
+        raise Return((initial_settings, updated_settings))

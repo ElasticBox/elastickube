@@ -3,34 +3,26 @@
 alias kubectl="/opt/kubernetes/v{{ kubernetes.KUBERNETES_VERSION }}/bin/kubectl $@"
 alias ks="/opt/kubernetes/v{{ kubernetes.KUBERNETES_VERSION }}/bin/kubectl --namespace=kube-system $@"
 
-function apilogs {
+# Tail component logs with colors
+function showlogs {
   local RED=`echo -e '\033[31m'`
   local GREEN=`echo -e '\033[32m'`
   local YELLOW=`echo -e '\033[33m'`
   local NORMAL=`echo -e '\033[0m'`
 
-  POD_NAME="$(ks get pods -l name=elastickube-server -o jsonpath="{.items[*].metadata.name}" | xargs -d ' ')"
-  ks logs -f $POD_NAME -c elastickube-api | sed "s/.*ERROR.*/$RED&$NORMAL/; s/.*INFO.*/$GREEN&$NORMAL/; s/.*WARN.*/$YELLOW&$NORMAL/"
-}
-
-function chartslogs {
-  local RED=`echo -e '\033[31m'`
-  local GREEN=`echo -e '\033[32m'`
-  local YELLOW=`echo -e '\033[33m'`
-  local NORMAL=`echo -e '\033[0m'`
-
-  POD_NAME="$(ks get pods -l name=elastickube-server -o jsonpath="{.items[*].metadata.name}" | xargs -d ' ')"
-  ks logs -f $POD_NAME -c elastickube-charts | sed "s/.*ERROR.*/$RED&$NORMAL/; s/.*INFO.*/$GREEN&$NORMAL/; s/.*WARN.*/$YELLOW&$NORMAL/"
-}
-
-function diagnosticslogs {
-  local RED=`echo -e '\033[31m'`
-  local GREEN=`echo -e '\033[32m'`
-  local YELLOW=`echo -e '\033[33m'`
-  local NORMAL=`echo -e '\033[0m'`
+  if [[ ! -n "$(echo "$1" | egrep "(api|charts|diagnostics|notifications)")" ]]; then
+    echo "Wrong option: $1"
+    echo "Usage show_logs ARGUMENT"
+    echo "ARGUMENT:"
+    echo " api - Show API Logs"
+    echo " charts - Show CHARTS Logs"
+    echo " diagnostics - Show DIAGNOSTICS Logs"
+    echo " notifications - Show NOTIFICATIONS Logs"
+    return 1
+  fi
 
   POD_NAME="$(ks get pods -l name=elastickube-server -o jsonpath="{.items[*].metadata.name}" | xargs -d ' ')"
-  ks logs -f $POD_NAME -c elastickube-diagnostics | sed "s/.*ERROR.*/$RED&$NORMAL/; s/.*INFO.*/$GREEN&$NORMAL/; s/.*WARN.*/$YELLOW&$NORMAL/"
+  ks logs -f $POD_NAME -c elastickube-$1 | sed "s/.*ERROR.*/$RED&$NORMAL/; s/.*INFO.*/$GREEN&$NORMAL/; s/.*WARN.*/$YELLOW&$NORMAL/"
 }
 
 function sshapi {
@@ -46,6 +38,11 @@ function sshcharts {
 function sshdiagnostics {
   POD_NAME="$(ks get pods -l name=elastickube-server -o jsonpath="{.items[*].metadata.name}" | xargs -d ' ')"
   ks exec -it $POD_NAME -c elastickube-diagnostics /bin/bash
+}
+
+function sshnotifications {
+  POD_NAME="$(ks get pods -l name=elastickube-server -o jsonpath="{.items[*].metadata.name}" | xargs -d ' ')"
+  ks exec -it $POD_NAME -c elastickube-notifications /bin/bash
 }
 
 function addusers {

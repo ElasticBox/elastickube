@@ -15,7 +15,6 @@ limitations under the License.
 */
 
 import Drop from 'tether-drop';
-
 import './ek-drop.less';
 import Directive from 'directive';
 import Controller from './ek-drop.controller';
@@ -29,6 +28,7 @@ class DropDirective extends Directive {
 
         this.bindToController = {
             openOn: '@?',
+            beforeClose: '&',
             targetPosition: '@',
             position: '@',
             remove: '@?'
@@ -39,18 +39,27 @@ class DropDirective extends Directive {
         tElement.addClass('ek-drop');
 
         return {
-            post: ($scope) => {
-                $scope.ctrl.drop = new Drop({
-                    target: $scope.ctrl.target,
-                    content: $scope.ctrl.content,
+            post: ($scope, $elem, attr, ctrl) => {
+                const dropOptions = {
+                    target: ctrl.target,
+                    content: ctrl.content,
                     constraintToWindow: true,
                     constrainToScrollParent: true,
-                    openOn: $scope.ctrl.openOn || 'click',
-                    position: $scope.ctrl.targetPosition || 'bottom left',
-                    remove: $scope.ctrl.remove === 'true',
+                    openOn: ctrl.openOn || 'click',
+                    position: ctrl.targetPosition || 'bottom left',
+                    remove: ctrl.remove === 'true',
                     tetherOptions: {
-                        attachment: $scope.ctrl.position || 'top right'
+                        attachment: ctrl.position || 'top right'
                     }
+                };
+
+                if (ctrl.beforeClose && _.isFunction(ctrl.beforeClose())) {
+                    dropOptions.beforeClose = ctrl.beforeClose();
+                }
+                ctrl.drop = new Drop(dropOptions);
+
+                $scope.$on('$destroy', () => {
+                    ctrl.drop.destroy();
                 });
             }
         };

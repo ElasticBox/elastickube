@@ -21,7 +21,7 @@ function dataFlowInitialization($injector) {
     $injector.get('instanceStore');
     $injector.get('instancesStore');
     $injector.get('namespacesStore');
-    $injector.get('principalStore');
+    $injector.get('notificationsStore');
     $injector.get('sessionStore');
     $injector.get('settingsStore');
     $injector.get('usersStore');
@@ -30,7 +30,7 @@ function dataFlowInitialization($injector) {
     $injector.get('instanceActionCreator');
     $injector.get('instancesActionCreator');
     $injector.get('namespacesActionCreator');
-    $injector.get('principalActionCreator');
+    $injector.get('notificationsActionCreator');
     $injector.get('sessionActionCreator');
     $injector.get('settingsActionCreator');
     $injector.get('usersActionCreator');

@@ -39,25 +39,26 @@ import MetricsActionCreatorService from './dataflow/metrics-action-creator.servi
 import MetricsStoreService from './dataflow/metrics-store.service.js';
 import NamespacesActionCreatorService from './dataflow/namespaces-action-creator.service.js';
 import NamespacesStoreService from './dataflow/namespaces-store.service.js';
+import NotificationsActionCreatorService from './dataflow/notifications-action-creator.service';
+import NotificationsStoreService from './dataflow/notifications-store.service.js';
 import SessionActionCreatorService from './dataflow/session-action-creator.service';
 import SessionStoreService from './dataflow/session-store.service.js';
 import SettingsActionCreatorService from './dataflow/settings-action-creator.service';
 import SettingsStoreService from './dataflow/settings-store.service';
-import PrincipalActionCreatorService from './dataflow/principal-action-creator.service';
-import PrincipalStoreService from './dataflow/principal-store.service.js';
 import UsersActionCreatorService from './dataflow/users-action-creator.service';
 import UsersStoreService from './dataflow/users-store.service.js';
 
 import humanizeDateFilter from './filters/humanize-date.filter';
 
 import FocusDirective from './directives/focus';
+import InfiniteScrollDirective from './directives/infinite-scroll';
 import OnFileChangeDirective from './directives/on-file-change';
 
 import AuthService from './security/auth.service';
 import CheckNamespaceService from './services/check-namespace.service';
 import InitializationService from './services/initialization.service';
 import MultiTranscludeService from './services/multi-transclude.service';
-import { NotificationsService } from './services/notifications.service.js';
+import { MessagesService } from './services/messages.service.js';
 import SessionService from './services/session.service';
 
 const moduleName = 'app.core';
@@ -83,7 +84,7 @@ angular
     .service('dispatcher', DispatcherService)
     .service('initialization', InitializationService)
     .service('multiTransclude', MultiTranscludeService)
-    .service('notifications', NotificationsService)
+    .service('messages', MessagesService)
     .service('session', SessionService)
 
     .service('chartsActionCreator', ChartsActionCreatorService)
@@ -104,8 +105,8 @@ angular
     .service('namespacesActionCreator', NamespacesActionCreatorService)
     .service('namespacesStore', NamespacesStoreService)
 
-    .service('principalActionCreator', PrincipalActionCreatorService)
-    .service('principalStore', PrincipalStoreService)
+    .service('notificationsActionCreator', NotificationsActionCreatorService)
+    .service('notificationsStore', NotificationsStoreService)
 
     .service('sessionActionCreator', SessionActionCreatorService)
     .service('sessionStore', SessionStoreService)
@@ -117,6 +118,7 @@ angular
     .service('usersStore', UsersStoreService)
 
     .directive('ekFocus', () => new FocusDirective())
+    .directive('ekInfiniteScroll', () => new InfiniteScrollDirective())
     .directive('ekOnFileChange', () => new OnFileChangeDirective());
 
 export default moduleName;

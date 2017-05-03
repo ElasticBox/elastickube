@@ -15,11 +15,12 @@ limitations under the License.
 */
 
 class InstanceController {
-    constructor($scope, $state, $stateParams, instancesNavigationActionCreator, instanceStore) {
+    constructor($q, $scope, $state, $stateParams, instancesNavigationActionCreator, instanceStore) {
         'ngInject';
 
         const onChange = () => this._updateInstance();
 
+        this._$q = $q;
         this._$state = $state;
         this._$stateParams = $stateParams;
         this._instancesNavigationActionCreator = instancesNavigationActionCreator;
@@ -39,6 +40,7 @@ class InstanceController {
         if (_.isUndefined(this.instance)) {
             return this._instancesNavigationActionCreator.instances();
         }
+        return this._$q.when();
     }
 
     selectTab(tabName = 'overview') {
@@ -59,6 +61,7 @@ class InstanceController {
                     return this._instancesNavigationActionCreator.instance({ namespace, instanceId });
             }
         }
+        return this._$q.when();
     }
 }
 

@@ -24,7 +24,6 @@ class NamespacesActionCreatorService {
         this._dispatcher = dispatcher;
 
         namespacesAPI.addOnCreatedListener((namespace) => this._dispatcher.dispatch({ type: this._actions.NAMESPACES_CREATED, namespace }));
-
         namespacesAPI.addOnUpdatedListener((namespace) => this._dispatcher.dispatch({ type: this._actions.NAMESPACES_UPDATED, namespace }));
         namespacesAPI.addOnDeletedListener((namespace) => this._dispatcher.dispatch({ type: this._actions.NAMESPACES_DELETED, namespace }));
     }

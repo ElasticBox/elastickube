@@ -17,10 +17,10 @@ limitations under the License.
 import moment from 'moment';
 
 class Logger {
-    constructor($delegate, debug, notifications, name) {
+    constructor($delegate, debug, messages, name) {
         this._$delegate = $delegate;
         this._debug = debug;
-        this._notifications = notifications;
+        this._messages = messages;
         this._name = name ? `[${name}]` : '--';
     }
 
@@ -33,7 +33,7 @@ class Logger {
             this._$delegate.info(...attrs);
         }
 
-        return this._notifications.info(...attrs);
+        return this._messages.info(...attrs);
     }
 
     warn(...attrs) {
@@ -41,7 +41,7 @@ class Logger {
             this._$delegate.warn(...attrs);
         }
 
-        return this._notifications.warn(...attrs);
+        return this._messages.warn(...attrs);
     }
 
     error(...attrs) {
@@ -49,12 +49,12 @@ class Logger {
             this._$delegate.error(...attrs);
         }
 
-        return this._notifications.error(...attrs);
+        return this._messages.error(...attrs);
     }
 
     debug(...attrs) {
         if (this._debug) {
-            return this._$delegate.debug(moment().local().format(), this._name, ...attrs);
+            this._$delegate.debug(moment().local().format(), this._name, ...attrs);
         }
     }
 }
@@ -62,12 +62,12 @@ class Logger {
 function logConfig($provide, $logProvider) {
     'ngInject';
 
-    $provide.decorator('$log', ($delegate, notifications) => {
+    $provide.decorator('$log', ($delegate, messages) => {
         'ngInject';
 
-        const commonLogger = new Logger($delegate, $logProvider.debugEnabled(), notifications);
+        const commonLogger = new Logger($delegate, $logProvider.debugEnabled(), messages);
 
-        commonLogger.getInstance = (name) => new Logger($delegate, $logProvider.debugEnabled(), notifications, name);
+        commonLogger.getInstance = (name) => new Logger($delegate, $logProvider.debugEnabled(), messages, name);
 
         return commonLogger;
     });

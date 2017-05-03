@@ -84,11 +84,41 @@ class Query(object):
 
         if '_id' not in document and not self.manipulate:
             document['_id'] = ObjectId()
+
         document_id = yield self.database[self.collection].insert(document, manipulate=self.manipulate)
         inserted_document = yield self.database[self.collection].find_one(
             {"_id": document_id},
             manipulate=self.manipulate)
+
         raise Return(inserted_document)
+
+    @coroutine
+    def insert_bulk(self, documents):
+        for document in documents:
+            if "metadata" in document:
+                document["metadata"]["resourceVersion"] = time.time()
+                document["metadata"]["creationTimestamp"] = time.time()
+                document["metadata"]["deletionTimestamp"] = None
+            else:
+                document["metadata"] = dict(
+                    resourceVersion=time.time(),
+                    creationTimestamp=time.time(),
+                    deletionTimestamp=None
+                )
+
+            if '_id' not in document and not self.manipulate:
+                document['_id'] = ObjectId()
+
+        documents_id = yield self.database[self.collection].insert(documents, manipulate=self.manipulate)
+        cursor = self.database[self.collection].find(
+            {"_id": {"$in": documents_id}},
+            manipulate=self.manipulate)
+
+        inserted_documents = []
+        while (yield cursor.fetch_next):
+            documents.append(cursor.next_object())
+
+        raise Return(inserted_documents)
 
     @coroutine
     def update(self, document):

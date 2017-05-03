@@ -14,24 +14,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-class NotificationsController {
-    constructor($scope, notifications) {
-        'ngInject';
-
-        const onChange = () => $scope.$evalAsync(() => this.messages = notifications.getMessages());
-
-        this._notifications = notifications;
-
-        this.messages = notifications.getMessages();
-
-        notifications.addChangeListener(onChange);
-
-        $scope.$on('$destroy', () => notifications.removeChangeListener(onChange));
+const states = [{
+    state: 'notifications',
+    config: {
+        parent: 'private',
+        template: '<ek-notifications flex></ek-notifications>',
+        url: '/notifications'
     }
+}];
 
-    removeMessage(message) {
-        this._notifications.removeMessage(message);
-    }
+function notificationsRoutes(routerHelperProvider) {
+    'ngInject';
+
+    routerHelperProvider.configureStates(states);
 }
 
-export default NotificationsController;
+export default notificationsRoutes;

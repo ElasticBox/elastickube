@@ -15,7 +15,7 @@ limitations under the License.
 """
 
 
-def filter_namespaces(data, user, _message):
+def filter_namespaces(data, user, _message, _settings):
     if user["role"] != "administrator":
         if isinstance(data, list):
             for item in data:
@@ -25,12 +25,12 @@ def filter_namespaces(data, user, _message):
             return data
         else:
             if "members" not in data or user["username"] not in data["members"]:
-                return None
-    else:
-        return data
+                return
+
+    return data
 
 
-def filter_metrics(data, user, message):
+def filter_metrics(data, _user, message, _settings):
     if "body" in message and "name" in message["body"]:
         if ("involvedObject" in data and
                 "name" in data["involvedObject"] and
@@ -42,3 +42,12 @@ def filter_metrics(data, user, message):
         return data
 
     return data
+
+
+def criteria_notifications(user, _message, _settings):
+    criteria = {
+        'user': user['username'],
+        'unread': True
+    }
+
+    return criteria

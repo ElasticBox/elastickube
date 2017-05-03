@@ -26,7 +26,8 @@ WATCHABLE_COLLECTIONS = [
     "elastickube.Namespaces",
     "elastickube.Settings",
     "elastickube.Charts",
-    "elastickube.Metrics"
+    "elastickube.Metrics",
+    "elastickube.Notifications"
 ]
 
 _callbacks = dict()

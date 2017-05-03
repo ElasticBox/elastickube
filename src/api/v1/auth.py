@@ -14,19 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from bson.objectid import ObjectId
 import cgi
 import json
 import logging
 import random
 import re
 import string
-import urllib
 import urlparse
-
 from datetime import datetime, timedelta
 
 import jwt
+from bson.objectid import ObjectId
 from lxml import etree
 from onelogin.saml2.auth import OneLogin_Saml2_Auth
 from onelogin.saml2.constants import OneLogin_Saml2_Constants
@@ -46,8 +44,8 @@ ROUNDS = 40000
 
 def _generate_hashed_password(password):
     salt = "".join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(64))
-    hash = sha512_crypt.encrypt((password + salt).encode("utf-8"), rounds=ROUNDS)
-    hash_parts = hash.split("$rounds={0}$".format(ROUNDS))
+    generated_hash = sha512_crypt.encrypt((password + salt).encode("utf-8"), rounds=ROUNDS)
+    hash_parts = generated_hash.split("$rounds={0}$".format(ROUNDS))
     return {"hash": hash_parts[1], "rounds": "{0}$rounds={1}$".format(hash_parts[0], ROUNDS), "salt": salt}
 
 
@@ -196,6 +194,15 @@ class SignupHandler(AuthHandler):
             )
 
             signup_user = yield Query(self.settings["database"], "Users").insert(user)
+            namespaces = yield Query(self.settings["database"], "Namespaces").find()
+            for namespace in namespaces:
+                if "members" in namespace:
+                    namespace["members"].append(signup_user["username"])
+                else:
+                    namespace["members"] = [signup_user["username"]]
+
+                yield Query(self.settings["database"], "Namespaces").update(namespace)
+
             token = yield self.authenticate_user(signup_user)
             self.write(token)
             self.flush()
@@ -495,7 +502,7 @@ class Saml2LoginHandler(AuthHandler):
         idp_sso = metadata_xml.find(
             Saml2LoginHandler.IDP_SSO_PATH, namespaces=OneLogin_Saml2_Constants.NSMAP).attrib['Location']
 
-        return (idp_entity_id, idp_domain, idp_cert, idp_sso)
+        return idp_entity_id, idp_domain, idp_cert, idp_sso
 
     @coroutine
     def _get_saml_auth(self, request):

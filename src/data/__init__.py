@@ -21,7 +21,7 @@ from tornado.gen import coroutine
 
 DEFAULT_GITREPO = "https://github.com/helm/charts-classic.git"
 DEFAULT_PASSWORD_REGEX = "^.{8,256}$"
-SCHEMA_VERSION = 3
+SCHEMA_VERSION = 4
 
 
 @coroutine
@@ -89,4 +89,27 @@ def migrate(database, settings):
                 database.Users.update({"_id": user["_id"]}, user)
 
         settings["schema_version"] = 3
+        database.Settings.update({"_id": settings["_id"]}, settings)
+
+    if settings["schema_version"] == 3:
+        admins = []
+        admins_cursor = database.Users.find({'role': 'administrator'})
+        while (yield admins_cursor.fetch_next):
+            admins.append(admins_cursor.next_object()["username"])
+
+        namespaces_cursor = database.Namespaces.find()
+        while (yield namespaces_cursor.fetch_next):
+            namespace = namespaces_cursor.next_object()
+            if "members" in namespace:
+                namespace["members"] = list(set(admins + namespace["members"]))
+            else:
+                namespace["members"] = admins
+
+            yield database.Namespaces.update({"_id": namespace["_id"]}, namespace)
+
+        yield database.Users.update({"notifications": {"$exists": False}},
+                                    {"$set": {"notifications": {"namespace": True}}},
+                                    multi=True)
+
+        settings["schema_version"] = 4
         database.Settings.update({"_id": settings["_id"]}, settings)

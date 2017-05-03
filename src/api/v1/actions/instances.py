@@ -30,6 +30,7 @@ class InstancesActions(object):
         self.kube = settings["kube"]
         self.database = settings["database"]
         self.user = user
+        self.notifications = []
 
     @coroutine
     def check_permissions(self, operation, document):
@@ -82,3 +83,7 @@ class InstancesActions(object):
             document["name"], namespace=document["namespace"])
 
         raise Return(response)
+
+    @coroutine
+    def create_notification(self, request, result):
+        logging.debug('Creating notifications for request %s and result %s', request, result)
