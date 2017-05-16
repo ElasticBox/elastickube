@@ -91,10 +91,16 @@ if (db.Users.findOne({ 'email': 'engineer@elasticbox.com'}) == null) {
 ______________________MONGO_SCRIPT______________________
 
 # Wait for api to be up
-echo -n "Waiting API endpoint to be available"
-until curl localhost/api/v1/auth/providers | grep 'password' > /dev/null 2>&1
+echo -n "Waiting API endpoint to be available..."
+for i in `seq 20`
 do
-    echo -n "."
-    sleep 10;
+  sleep 10
+  echo -n "Checking if API endpoint is online #$i: "
+  if curl localhost/api/v1/auth/providers | grep 'password' > /dev/null 2>&1
+  then
+    echo "API endpoint is online!"
+    break
+  fi
 done
+
 echo ""
